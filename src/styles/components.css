@@ -448,6 +448,41 @@
   width: 1px;
 }
 
+.ms-skeleton {
+  animation: ms-skeleton-pulse 1.8s ease-in-out infinite;
+  background:
+    linear-gradient(90deg, rgba(234, 223, 202, 0.44), rgba(228, 241, 242, 0.7), rgba(234, 223, 202, 0.44)),
+    var(--ms-color-cream-200);
+  background-size: 220% 100%;
+  border-radius: var(--ms-radius-sm);
+  display: block;
+}
+
+.ms-skeleton--text {
+  height: 1rem;
+  width: 12rem;
+}
+
+.ms-skeleton--block {
+  height: 6rem;
+  width: 18rem;
+}
+
+.ms-skeleton--circle {
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+}
+
+@keyframes ms-skeleton-pulse {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
