@@ -67,15 +67,28 @@ npm run storybook
 
 ## Components
 
+- `Accordion`
+- `Alert`
+- `Avatar`
 - `Badge`
+- `Breadcrumb`
 - `Button`
 - `Card`
+- `Checkbox`
 - `Dialog`
 - `Field`
+- `Pagination`
+- `Progress`
+- `RadioGroup`
 - `Select`
+- `Separator`
+- `Skeleton`
+- `Slider`
+- `Spinner`
 - `Switch`
 - `Tabs`
 - `Toast`
+- `Tooltip`
 
 ## Publishing
 

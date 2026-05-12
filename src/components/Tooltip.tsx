@@ -1,9 +1,9 @@
-import type { ReactElement, ReactNode } from "react";
+import type { HTMLAttributes, ReactElement, ReactNode } from "react";
 import { cloneElement, isValidElement, useId, useState } from "react";
 
 export type TooltipProps = {
   content: ReactNode;
-  children: ReactElement;
+  children: ReactElement<HTMLAttributes<HTMLElement>>;
 };
 
 export function Tooltip({ content, children }: TooltipProps) {

@@ -12,6 +12,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Basic: Story = {
+  args: {
+    page: 2,
+    totalPages: 5,
+    onPageChange: () => undefined,
+  },
   render: () => {
     const [page, setPage] = useState(2);
     return <Pagination page={page} totalPages={5} onPageChange={setPage} />;
