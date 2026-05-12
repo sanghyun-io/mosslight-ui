@@ -322,6 +322,42 @@
   margin-top: 0.1rem;
 }
 
+.ms-progress {
+  display: grid;
+  gap: var(--ms-space-2);
+  min-width: 14rem;
+}
+
+.ms-progress__header {
+  align-items: center;
+  color: var(--ms-color-ink-600);
+  display: flex;
+  font-size: 0.84rem;
+  font-weight: 800;
+  justify-content: space-between;
+}
+
+.ms-progress__header strong {
+  color: var(--ms-color-ink-800);
+}
+
+.ms-progress__track {
+  background: rgba(234, 223, 202, 0.72);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-pill);
+  height: 0.85rem;
+  overflow: hidden;
+}
+
+.ms-progress__bar {
+  background:
+    linear-gradient(90deg, var(--ms-color-moss-500), var(--ms-color-sky-400)),
+    var(--ms-color-moss-500);
+  display: block;
+  height: 100%;
+  transition: width var(--ms-motion-slow);
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
