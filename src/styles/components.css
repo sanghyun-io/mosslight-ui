@@ -483,6 +483,35 @@
   }
 }
 
+.ms-slider {
+  display: grid;
+  gap: var(--ms-space-3);
+  min-width: 14rem;
+}
+
+.ms-slider__header {
+  align-items: center;
+  display: flex;
+  font-size: 0.88rem;
+  font-weight: 850;
+  justify-content: space-between;
+}
+
+.ms-slider__header strong {
+  color: var(--ms-color-moss-700);
+}
+
+.ms-slider__control {
+  accent-color: var(--ms-color-moss-700);
+  cursor: pointer;
+  width: 100%;
+}
+
+.ms-slider__control:focus-visible {
+  box-shadow: var(--ms-focus);
+  outline: none;
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
