@@ -78,6 +78,56 @@
   flex: 0 0 auto;
 }
 
+.ms-accordion {
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-md);
+  overflow: hidden;
+}
+
+.ms-accordion__item + .ms-accordion__item {
+  border-top: var(--ms-border-ink);
+}
+
+.ms-accordion__trigger {
+  align-items: center;
+  background: rgba(255, 250, 240, 0.76);
+  border: 0;
+  color: var(--ms-color-ink-800);
+  cursor: pointer;
+  display: flex;
+  font-weight: 850;
+  justify-content: space-between;
+  min-height: 3rem;
+  padding: 0 var(--ms-space-4);
+  text-align: left;
+  width: 100%;
+}
+
+.ms-accordion__trigger:focus-visible {
+  box-shadow: var(--ms-focus);
+  outline: none;
+}
+
+.ms-accordion__chevron {
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  height: 0.55rem;
+  transform: rotate(45deg);
+  transition: transform var(--ms-motion-fast);
+  width: 0.55rem;
+}
+
+.ms-accordion__trigger[aria-expanded="true"] .ms-accordion__chevron {
+  transform: rotate(225deg);
+}
+
+.ms-accordion__panel {
+  background: rgba(246, 240, 223, 0.6);
+  color: var(--ms-color-ink-600);
+  line-height: 1.65;
+  padding: var(--ms-space-4);
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
