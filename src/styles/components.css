@@ -179,6 +179,44 @@
   box-shadow: inset 4px 0 0 var(--ms-color-rose-500), var(--ms-shadow-1);
 }
 
+.ms-avatar {
+  align-items: center;
+  background:
+    linear-gradient(145deg, rgba(228, 241, 242, 0.72), rgba(220, 232, 207, 0.74)),
+    var(--ms-color-paper);
+  border: var(--ms-border-ink);
+  border-radius: 50%;
+  color: var(--ms-color-moss-700);
+  display: inline-flex;
+  font-weight: 900;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ms-avatar--sm {
+  font-size: 0.72rem;
+  height: 2rem;
+  width: 2rem;
+}
+
+.ms-avatar--md {
+  font-size: 0.9rem;
+  height: 2.75rem;
+  width: 2.75rem;
+}
+
+.ms-avatar--lg {
+  font-size: 1.12rem;
+  height: 3.5rem;
+  width: 3.5rem;
+}
+
+.ms-avatar img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);

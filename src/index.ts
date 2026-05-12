@@ -2,6 +2,7 @@ import "./styles.css";
 
 export { Accordion } from "./components/Accordion";
 export { Alert } from "./components/Alert";
+export { Avatar } from "./components/Avatar";
 export { Badge } from "./components/Badge";
 export { Button } from "./components/Button";
 export { Card } from "./components/Card";
@@ -13,6 +14,7 @@ export { Tabs } from "./components/Tabs";
 export { Toast, ToastViewport } from "./components/Toast";
 export type { AccordionItem, AccordionProps } from "./components/Accordion";
 export type { AlertProps } from "./components/Alert";
+export type { AvatarProps } from "./components/Avatar";
 export type { BadgeProps } from "./components/Badge";
 export type { ButtonProps } from "./components/Button";
 export type { CardProps } from "./components/Card";
