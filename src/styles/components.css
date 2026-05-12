@@ -512,6 +512,39 @@
   outline: none;
 }
 
+.ms-spinner {
+  display: inline-flex;
+}
+
+.ms-spinner__mark {
+  animation: ms-spinner-turn 820ms linear infinite;
+  border: 2px solid rgba(57, 87, 66, 0.18);
+  border-radius: 50%;
+  border-top-color: var(--ms-color-moss-700);
+  display: block;
+}
+
+.ms-spinner--sm .ms-spinner__mark {
+  height: 1rem;
+  width: 1rem;
+}
+
+.ms-spinner--md .ms-spinner__mark {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.ms-spinner--lg .ms-spinner__mark {
+  height: 2.25rem;
+  width: 2.25rem;
+}
+
+@keyframes ms-spinner-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
