@@ -24,6 +24,9 @@ jobs:
       - name: Build package and demo
         run: npm run build
 
+      - name: Test components
+        run: npm test
+
       - name: Build Storybook
         run: npm run build-storybook
 
