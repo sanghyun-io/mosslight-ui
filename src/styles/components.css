@@ -254,6 +254,74 @@
   color: rgba(39, 50, 56, 0.34);
 }
 
+.ms-checkbox {
+  align-items: flex-start;
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--ms-space-3);
+}
+
+.ms-checkbox__input {
+  height: 1px;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.ms-checkbox__box {
+  align-items: center;
+  background: rgba(255, 250, 240, 0.9);
+  border: var(--ms-border-ink);
+  border-radius: 5px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 1.35rem;
+  justify-content: center;
+  margin-top: 0.08rem;
+  transition:
+    background-color var(--ms-motion-fast),
+    box-shadow var(--ms-motion-fast);
+  width: 1.35rem;
+}
+
+.ms-checkbox__box::after {
+  border-bottom: 2px solid var(--ms-color-paper);
+  border-right: 2px solid var(--ms-color-paper);
+  content: "";
+  height: 0.62rem;
+  opacity: 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+  width: 0.34rem;
+}
+
+.ms-checkbox__input:checked + .ms-checkbox__box {
+  background: var(--ms-color-moss-700);
+}
+
+.ms-checkbox__input:checked + .ms-checkbox__box::after {
+  opacity: 1;
+}
+
+.ms-checkbox__input:focus-visible + .ms-checkbox__box {
+  box-shadow: var(--ms-focus);
+}
+
+.ms-checkbox__label,
+.ms-checkbox__hint {
+  display: block;
+}
+
+.ms-checkbox__label {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.ms-checkbox__hint {
+  color: var(--ms-color-ink-600);
+  font-size: 0.78rem;
+  margin-top: 0.1rem;
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
