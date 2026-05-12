@@ -545,6 +545,29 @@
   }
 }
 
+.ms-tooltip {
+  display: inline-flex;
+  position: relative;
+}
+
+.ms-tooltip__content {
+  background: var(--ms-color-ink-800);
+  border-radius: var(--ms-radius-sm);
+  bottom: calc(100% + var(--ms-space-2));
+  box-shadow: var(--ms-shadow-1);
+  color: var(--ms-color-paper);
+  font-size: 0.78rem;
+  font-weight: 800;
+  left: 50%;
+  line-height: 1.35;
+  max-width: 14rem;
+  padding: var(--ms-space-2) var(--ms-space-3);
+  position: absolute;
+  transform: translateX(-50%);
+  width: max-content;
+  z-index: 20;
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
