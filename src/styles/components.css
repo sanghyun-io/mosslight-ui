@@ -568,6 +568,34 @@
   z-index: 20;
 }
 
+.ms-pagination,
+.ms-pagination__pages {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ms-space-2);
+}
+
+.ms-pagination__page {
+  background: rgba(255, 250, 240, 0.72);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-sm);
+  cursor: pointer;
+  font-weight: 850;
+  height: 2rem;
+  min-width: 2rem;
+}
+
+.ms-pagination__page[aria-current="page"] {
+  background: var(--ms-color-moss-700);
+  color: var(--ms-color-paper);
+}
+
+.ms-pagination__page:focus-visible {
+  box-shadow: var(--ms-focus);
+  outline: none;
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
