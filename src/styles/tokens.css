@@ -1,0 +1,80 @@
+:root {
+  color-scheme: light;
+  --ms-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ms-font-serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+
+  --ms-color-parchment: #f6f0df;
+  --ms-color-paper: #fffaf0;
+  --ms-color-cream-100: #fbf5e7;
+  --ms-color-cream-200: #eadfca;
+  --ms-color-ink-800: #273238;
+  --ms-color-ink-600: #53636a;
+  --ms-color-moss-700: #395742;
+  --ms-color-moss-500: #66845f;
+  --ms-color-moss-200: #dce8cf;
+  --ms-color-sky-500: #608aa0;
+  --ms-color-sky-400: #9ec2cf;
+  --ms-color-sky-150: #e4f1f2;
+  --ms-color-plum-500: #8b6688;
+  --ms-color-plum-150: #f0e4ee;
+  --ms-color-amber-500: #b9823a;
+  --ms-color-amber-400: #e2b75e;
+  --ms-color-amber-150: #faedc9;
+  --ms-color-rose-500: #b06363;
+
+  --ms-space-1: 0.25rem;
+  --ms-space-2: 0.5rem;
+  --ms-space-3: 0.75rem;
+  --ms-space-4: 1rem;
+  --ms-space-5: 1.25rem;
+  --ms-space-6: 1.5rem;
+  --ms-space-8: 2rem;
+  --ms-space-10: 2.5rem;
+
+  --ms-radius-sm: 6px;
+  --ms-radius-md: 8px;
+  --ms-radius-lg: 14px;
+  --ms-radius-pill: 999px;
+
+  --ms-shadow-1: 0 2px 0 rgba(39, 50, 56, 0.16), 0 12px 32px rgba(57, 87, 66, 0.12);
+  --ms-shadow-2: 0 3px 0 rgba(39, 50, 56, 0.18), 0 18px 42px rgba(57, 87, 66, 0.18);
+  --ms-border-ink: 1px solid rgba(39, 50, 56, 0.16);
+  --ms-focus: 0 0 0 4px rgba(158, 194, 207, 0.48);
+  --ms-motion-slow: 720ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ms-motion-fast: 160ms ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--ms-color-ink-800);
+  font-family: var(--ms-font-sans);
+  background:
+    linear-gradient(120deg, rgba(228, 241, 242, 0.76), transparent 38%),
+    linear-gradient(180deg, var(--ms-color-paper), var(--ms-color-parchment));
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}

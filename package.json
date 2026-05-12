@@ -1,0 +1,71 @@
+{
+  "name": "mosslight-ui",
+  "version": "0.1.0",
+  "description": "Warm fantasy React UI primitives with moss, parchment, sky accents, tactile borders, and restrained ambient motion.",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://sanghyun-io.github.io/mosslight-ui/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanghyun-io/mosslight-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sanghyun-io/mosslight-ui/issues"
+  },
+  "keywords": [
+    "react",
+    "ui",
+    "design-system",
+    "components",
+    "storybook",
+    "fantasy-ui"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/mosslight-ui.cjs",
+  "module": "./dist/mosslight-ui.js",
+  "types": "./dist/index.d.ts",
+  "style": "./dist/styles.css",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/mosslight-ui.js",
+      "require": "./dist/mosslight-ui.cjs"
+    },
+    "./styles.css": {
+      "types": "./dist/styles.css.d.ts",
+      "default": "./dist/styles.css"
+    }
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "npm run build:lib && npm run build:demo",
+    "build:demo": "tsc --noEmit -p tsconfig.json && vite build",
+    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json && node scripts/finalize-package.mjs",
+    "prepare": "npm run build:lib",
+    "preview": "vite preview --host 127.0.0.1",
+    "storybook": "storybook dev -p 6006 --host 127.0.0.1",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0 || >=19.0.0",
+    "react-dom": ">=18.2.0 || >=19.0.0"
+  },
+  "devDependencies": {
+    "@storybook/react-vite": "^10.3.6",
+    "@types/node": "^25.7.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "lucide-react": "^0.555.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "storybook": "^10.3.6",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.7"
+  }
+}

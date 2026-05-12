@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-demo/
+storybook-static/
+*.local
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+vite.lib.config.js
+vite.lib.config.d.ts
+
+vite-dev*.log
+storybook-dev*.log
+mosslight-*.png

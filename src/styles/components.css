@@ -1,0 +1,435 @@
+.ms-button {
+  align-items: center;
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 750;
+  gap: var(--ms-space-2);
+  justify-content: center;
+  letter-spacing: 0;
+  line-height: 1;
+  min-width: 2.5rem;
+  position: relative;
+  transition:
+    transform var(--ms-motion-fast),
+    box-shadow var(--ms-motion-fast),
+    background-color var(--ms-motion-fast);
+  white-space: nowrap;
+}
+
+.ms-button:hover {
+  box-shadow: var(--ms-shadow-1);
+  transform: translateY(-1px);
+}
+
+.ms-button:active {
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+.ms-button:focus-visible,
+.ms-field__control:focus-visible,
+.ms-switch__input:focus-visible + .ms-switch__track {
+  box-shadow: var(--ms-focus);
+  outline: none;
+}
+
+.ms-button--sm {
+  font-size: 0.82rem;
+  min-height: 2rem;
+  padding: 0 var(--ms-space-3);
+}
+
+.ms-button--md {
+  font-size: 0.92rem;
+  min-height: 2.5rem;
+  padding: 0 var(--ms-space-4);
+}
+
+.ms-button--lg {
+  font-size: 1rem;
+  min-height: 3rem;
+  padding: 0 var(--ms-space-5);
+}
+
+.ms-button--primary {
+  background: var(--ms-color-moss-700);
+  color: var(--ms-color-paper);
+}
+
+.ms-button--secondary {
+  background: var(--ms-color-amber-150);
+  color: var(--ms-color-ink-800);
+}
+
+.ms-button--ghost {
+  background: rgba(255, 250, 240, 0.68);
+  color: var(--ms-color-ink-800);
+}
+
+.ms-button--danger {
+  background: var(--ms-color-rose-500);
+  color: var(--ms-color-paper);
+}
+
+.ms-button__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.ms-badge {
+  align-items: center;
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-pill);
+  display: inline-flex;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+  min-height: 1.55rem;
+  padding: 0 var(--ms-space-3);
+  text-transform: uppercase;
+  width: max-content;
+}
+
+.ms-badge--moss {
+  background: var(--ms-color-moss-200);
+  color: var(--ms-color-moss-700);
+}
+
+.ms-badge--sky {
+  background: var(--ms-color-sky-150);
+  color: var(--ms-color-sky-500);
+}
+
+.ms-badge--amber {
+  background: var(--ms-color-amber-150);
+  color: #75511f;
+}
+
+.ms-badge--plum {
+  background: var(--ms-color-plum-150);
+  color: var(--ms-color-plum-500);
+}
+
+.ms-card {
+  align-content: start;
+  background: rgba(255, 250, 240, 0.86);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-md);
+  box-shadow: var(--ms-shadow-1);
+  display: grid;
+  gap: var(--ms-space-4);
+  min-height: 12rem;
+  overflow: hidden;
+  padding: var(--ms-space-5);
+  position: relative;
+}
+
+.ms-card > .ms-badge {
+  justify-self: start;
+}
+
+.ms-card::before {
+  content: "";
+  height: 4px;
+  inset: 0 0 auto;
+  position: absolute;
+}
+
+.ms-card--moss::before {
+  background: var(--ms-color-moss-500);
+}
+
+.ms-card--sky::before {
+  background: var(--ms-color-sky-400);
+}
+
+.ms-card--amber::before {
+  background: var(--ms-color-amber-400);
+}
+
+.ms-card--plum::before {
+  background: var(--ms-color-plum-500);
+}
+
+.ms-field {
+  display: grid;
+  gap: var(--ms-space-2);
+}
+
+.ms-field__label,
+.ms-switch__label {
+  color: var(--ms-color-ink-800);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.ms-field__control {
+  background: rgba(255, 250, 240, 0.9);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-sm);
+  color: var(--ms-color-ink-800);
+  min-height: 2.75rem;
+  padding: 0 var(--ms-space-4);
+  transition:
+    border-color var(--ms-motion-fast),
+    box-shadow var(--ms-motion-fast);
+  width: 100%;
+}
+
+.ms-field__hint {
+  color: var(--ms-color-ink-600);
+  font-size: 0.78rem;
+}
+
+.ms-switch {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--ms-space-3);
+  width: max-content;
+}
+
+.ms-switch__input {
+  height: 1px;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.ms-switch__track {
+  background: var(--ms-color-cream-200);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-pill);
+  display: inline-flex;
+  height: 1.65rem;
+  padding: 3px;
+  transition:
+    background-color var(--ms-motion-fast),
+    box-shadow var(--ms-motion-fast);
+  width: 3rem;
+}
+
+.ms-switch__thumb {
+  background: var(--ms-color-paper);
+  border: var(--ms-border-ink);
+  border-radius: 50%;
+  display: block;
+  height: 1.1rem;
+  transform: translateX(0);
+  transition: transform var(--ms-motion-fast);
+  width: 1.1rem;
+}
+
+.ms-switch__input:checked + .ms-switch__track {
+  background: var(--ms-color-moss-500);
+}
+
+.ms-switch__input:checked + .ms-switch__track .ms-switch__thumb {
+  transform: translateX(1.3rem);
+}
+
+.ms-dialog {
+  display: grid;
+  inset: 0;
+  place-items: center;
+  position: fixed;
+  z-index: 50;
+}
+
+.ms-dialog__scrim {
+  background: rgba(39, 50, 56, 0.34);
+  border: 0;
+  cursor: pointer;
+  inset: 0;
+  position: absolute;
+}
+
+.ms-dialog__panel {
+  animation: ms-dialog-enter 180ms ease both;
+  background:
+    linear-gradient(180deg, rgba(228, 241, 242, 0.5), transparent 46%),
+    var(--ms-color-paper);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-md);
+  box-shadow: var(--ms-shadow-2);
+  display: grid;
+  gap: var(--ms-space-5);
+  max-height: min(82vh, 42rem);
+  max-width: min(92vw, 34rem);
+  overflow: auto;
+  padding: var(--ms-space-6);
+  position: relative;
+  width: 100%;
+}
+
+.ms-dialog__header,
+.ms-dialog__footer,
+.ms-toast {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--ms-space-4);
+  justify-content: space-between;
+}
+
+.ms-dialog__header h2 {
+  font-family: var(--ms-font-serif);
+  font-size: 1.8rem;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.ms-dialog__header p,
+.ms-dialog__body,
+.ms-toast p {
+  color: var(--ms-color-ink-600);
+  line-height: 1.65;
+}
+
+.ms-dialog__header p,
+.ms-toast p {
+  margin: var(--ms-space-2) 0 0;
+}
+
+.ms-dialog__body {
+  font-size: 0.95rem;
+}
+
+.ms-dialog__footer {
+  justify-content: flex-end;
+}
+
+.ms-select__wrap {
+  position: relative;
+}
+
+.ms-select__wrap::after {
+  border-color: var(--ms-color-ink-600) transparent transparent;
+  border-style: solid;
+  border-width: 6px 5px 0;
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  right: var(--ms-space-4);
+  top: calc(50% - 2px);
+}
+
+.ms-select__control {
+  appearance: none;
+  cursor: pointer;
+  padding-right: var(--ms-space-10);
+}
+
+.ms-tabs {
+  display: grid;
+  gap: var(--ms-space-3);
+}
+
+.ms-tabs__list {
+  align-items: center;
+  background: rgba(255, 250, 240, 0.64);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-sm);
+  display: inline-flex;
+  gap: var(--ms-space-1);
+  padding: 4px;
+  width: max-content;
+}
+
+.ms-tabs__tab {
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  color: var(--ms-color-ink-600);
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 2rem;
+  padding: 0 var(--ms-space-3);
+}
+
+.ms-tabs__tab[aria-selected="true"] {
+  background: var(--ms-color-moss-700);
+  color: var(--ms-color-paper);
+}
+
+.ms-tabs__tab:focus-visible {
+  box-shadow: var(--ms-focus);
+  outline: none;
+}
+
+.ms-tabs__panel {
+  background: rgba(255, 250, 240, 0.68);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-md);
+  color: var(--ms-color-ink-600);
+  line-height: 1.65;
+  min-height: 7rem;
+  padding: var(--ms-space-4);
+}
+
+.ms-toast-viewport {
+  display: grid;
+  gap: var(--ms-space-3);
+  max-width: 26rem;
+  width: 100%;
+}
+
+.ms-toast {
+  background: var(--ms-color-paper);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-md);
+  box-shadow: var(--ms-shadow-1);
+  min-height: 5rem;
+  padding: var(--ms-space-4);
+}
+
+.ms-toast strong {
+  display: block;
+  font-size: 0.96rem;
+}
+
+.ms-toast--moss {
+  box-shadow: inset 4px 0 0 var(--ms-color-moss-500), var(--ms-shadow-1);
+}
+
+.ms-toast--sky {
+  box-shadow: inset 4px 0 0 var(--ms-color-sky-400), var(--ms-shadow-1);
+}
+
+.ms-toast--amber {
+  box-shadow: inset 4px 0 0 var(--ms-color-amber-400), var(--ms-shadow-1);
+}
+
+.ms-toast--plum {
+  box-shadow: inset 4px 0 0 var(--ms-color-plum-500), var(--ms-shadow-1);
+}
+
+@keyframes ms-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 560px) {
+  .ms-dialog__header,
+  .ms-dialog__footer,
+  .ms-toast {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ms-tabs__list {
+    width: 100%;
+  }
+
+  .ms-tabs__tab {
+    flex: 1 1 0;
+  }
+}
