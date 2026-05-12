@@ -431,6 +431,23 @@
   opacity: 0.55;
 }
 
+.ms-separator {
+  background: rgba(39, 50, 56, 0.16);
+  border: 0;
+  margin: 0;
+}
+
+.ms-separator--horizontal {
+  height: 1px;
+  width: 100%;
+}
+
+.ms-separator--vertical {
+  align-self: stretch;
+  min-height: 1.5rem;
+  width: 1px;
+}
+
 .ms-badge {
   align-items: center;
   border: var(--ms-border-ink);
