@@ -26,6 +26,20 @@
   z-index: 0;
 }
 
+.site-shell::after {
+  animation: page-mana-drift 18s ease-in-out infinite;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(226, 183, 94, 0.2), transparent 16rem),
+    radial-gradient(circle at 78% 18%, rgba(158, 194, 207, 0.26), transparent 18rem),
+    radial-gradient(circle at 52% 72%, rgba(132, 82, 120, 0.16), transparent 20rem);
+  content: "";
+  inset: 0;
+  opacity: 0.72;
+  pointer-events: none;
+  position: fixed;
+  z-index: 0;
+}
+
 .site-shell > * {
   position: relative;
   z-index: 1;
@@ -205,6 +219,16 @@
   min-height: 40rem;
   overflow: hidden;
   position: relative;
+  transform-style: preserve-3d;
+  transition: transform 360ms ease, box-shadow 360ms ease;
+}
+
+.anime-stage:hover {
+  box-shadow:
+    0 5px 0 color-mix(in srgb, var(--ms-text-primary) 18%, transparent),
+    0 54px 110px rgba(57, 87, 66, 0.36),
+    0 0 62px color-mix(in srgb, var(--ms-color-sky-400) 28%, transparent);
+  transform: translateY(-3px);
 }
 
 .anime-stage::before {
@@ -297,6 +321,7 @@
 }
 
 .anime-stage__sun {
+  animation: sun-pulse 5.6s ease-in-out infinite;
   background:
     linear-gradient(145deg, #fff6c9, var(--ms-color-amber-400));
   border: var(--ms-border-ink);
@@ -310,6 +335,133 @@
   top: 10%;
   width: 5.2rem;
   z-index: 1;
+}
+
+.anime-stage__mana-field {
+  background:
+    radial-gradient(circle at var(--spell-x, 50%) var(--spell-y, 50%), rgba(255, 250, 240, 0.74), transparent 0.6rem),
+    radial-gradient(circle at var(--spell-x, 50%) var(--spell-y, 50%), rgba(226, 183, 94, 0.32), transparent 9rem),
+    conic-gradient(from 120deg at var(--spell-x, 50%) var(--spell-y, 50%), transparent, rgba(255, 250, 240, 0.2), transparent, rgba(158, 194, 207, 0.24), transparent);
+  filter: blur(0.2px);
+  inset: 0;
+  mix-blend-mode: screen;
+  opacity: 0.72;
+  pointer-events: none;
+  position: absolute;
+  transition: background-position 140ms ease;
+  z-index: 2;
+}
+
+.anime-stage__glyph {
+  animation: glyph-orbit 11s linear infinite;
+  border: 1px solid color-mix(in srgb, var(--ms-color-paper) 64%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 7px rgba(255, 250, 240, 0.08),
+    0 0 28px rgba(226, 183, 94, 0.22);
+  height: 9rem;
+  pointer-events: none;
+  position: absolute;
+  width: 9rem;
+  z-index: 2;
+}
+
+.anime-stage__glyph::before,
+.anime-stage__glyph::after {
+  border: 1px solid color-mix(in srgb, var(--ms-color-sky-400) 54%, transparent);
+  border-radius: 50%;
+  content: "";
+  inset: 18%;
+  position: absolute;
+}
+
+.anime-stage__glyph::after {
+  border-color: color-mix(in srgb, var(--ms-color-amber-400) 58%, transparent);
+  inset: 36%;
+}
+
+.anime-stage__glyph--one {
+  left: 7%;
+  top: 58%;
+}
+
+.anime-stage__glyph--two {
+  animation-direction: reverse;
+  animation-duration: 14s;
+  height: 6.7rem;
+  right: 11%;
+  top: 9%;
+  width: 6.7rem;
+}
+
+.anime-stage__comet {
+  animation: comet-cut 3.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 250, 240, 0.9), rgba(226, 183, 94, 0.76), transparent);
+  border-radius: 999px;
+  height: 0.22rem;
+  pointer-events: none;
+  position: absolute;
+  transform: rotate(-24deg);
+  width: 12rem;
+  z-index: 3;
+}
+
+.anime-stage__comet--one {
+  animation-delay: 0.4s;
+  left: -24%;
+  top: 20%;
+}
+
+.anime-stage__comet--two {
+  animation-delay: 2.1s;
+  left: -18%;
+  top: 72%;
+  width: 8rem;
+}
+
+.anime-stage__mote {
+  animation: mote-rise 5.8s ease-in-out infinite;
+  background: rgba(255, 250, 240, 0.86);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px rgba(226, 183, 94, 0.28),
+    0 0 18px rgba(226, 183, 94, 0.62);
+  height: 0.42rem;
+  pointer-events: none;
+  position: absolute;
+  width: 0.42rem;
+  z-index: 3;
+}
+
+.anime-stage__mote--one {
+  left: 18%;
+  top: 72%;
+}
+
+.anime-stage__mote--two {
+  animation-delay: 1.4s;
+  left: 52%;
+  top: 54%;
+}
+
+.anime-stage__mote--three {
+  animation-delay: 2.6s;
+  right: 16%;
+  top: 64%;
+}
+
+.anime-stage__spell-flash {
+  animation: spell-flash 760ms ease-out both;
+  background:
+    radial-gradient(circle at var(--spell-x, 50%) var(--spell-y, 50%), rgba(255, 250, 240, 0.92), transparent 2.8rem),
+    radial-gradient(circle at var(--spell-x, 50%) var(--spell-y, 50%), rgba(226, 183, 94, 0.58), transparent 10rem),
+    conic-gradient(from 0deg at var(--spell-x, 50%) var(--spell-y, 50%), transparent, rgba(255, 250, 240, 0.8), transparent 26%, rgba(158, 194, 207, 0.62), transparent 54%, rgba(132, 82, 120, 0.46), transparent);
+  inset: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  position: absolute;
+  z-index: 5;
 }
 
 .anime-stage__ridge {
@@ -337,6 +489,7 @@
 }
 
 .anime-stage__grass {
+  animation: grass-sway 4.2s ease-in-out infinite;
   background:
     repeating-linear-gradient(92deg, transparent 0 10px, color-mix(in srgb, var(--ms-color-moss-700) 86%, var(--ms-color-amber-400)) 10px 12px, transparent 12px 28px),
     linear-gradient(180deg, transparent, rgba(39, 50, 56, 0.1));
@@ -363,6 +516,15 @@
   right: 10%;
   top: 29%;
   z-index: 2;
+  transition: transform 280ms ease, box-shadow 280ms ease;
+}
+
+.anime-stage:hover .anime-window {
+  box-shadow:
+    0 3px 0 color-mix(in srgb, var(--ms-text-primary) 12%, transparent),
+    0 30px 66px rgba(39, 50, 56, 0.28),
+    0 0 40px color-mix(in srgb, var(--ms-color-amber-400) 22%, transparent);
+  transform: translateY(-4px);
 }
 
 .anime-window__bar {
@@ -583,7 +745,9 @@
   display: grid;
   gap: 0.18rem;
   min-height: 3.35rem;
+  overflow: hidden;
   padding: var(--ms-space-2) var(--ms-space-3);
+  position: relative;
   text-align: left;
   transition:
     background-color 160ms ease,
@@ -591,11 +755,33 @@
     transform 160ms ease;
 }
 
+.component-menu__item::before {
+  background:
+    radial-gradient(circle, rgba(255, 250, 240, 0.88), transparent 0.36rem),
+    linear-gradient(90deg, rgba(226, 183, 94, 0.46), transparent);
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-26%);
+  transition: opacity 180ms ease, transform 280ms ease;
+}
+
 .component-menu__item:hover,
 .component-menu__item[aria-current="true"] {
   background: var(--ms-surface-panel);
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--ms-text-primary) 14%, transparent);
+  box-shadow:
+    0 3px 0 color-mix(in srgb, var(--ms-text-primary) 14%, transparent),
+    0 0 28px color-mix(in srgb, var(--ms-color-sky-400) 24%, transparent);
   transform: translateY(-1px);
+}
+
+.component-menu__item:hover::before,
+.component-menu__item[aria-current="true"]::before {
+  opacity: 0.8;
+  transform: translateX(18%);
 }
 
 .component-menu__item span {
@@ -650,6 +836,34 @@
   display: grid;
   min-height: 16rem;
   padding: clamp(1rem, 4vw, 2rem);
+  overflow: hidden;
+  position: relative;
+}
+
+.component-demo-surface::before,
+.prop-preview::before {
+  animation: preview-mana-sweep 6.4s ease-in-out infinite;
+  background:
+    radial-gradient(circle at 20% 78%, rgba(226, 183, 94, 0.28), transparent 8rem),
+    radial-gradient(circle at 82% 22%, rgba(158, 194, 207, 0.3), transparent 9rem),
+    linear-gradient(115deg, transparent 0 28%, rgba(255, 250, 240, 0.2) 42%, transparent 58%);
+  content: "";
+  inset: 0;
+  opacity: 0.7;
+  pointer-events: none;
+  position: absolute;
+}
+
+.component-demo-surface > *,
+.prop-preview > * {
+  position: relative;
+  z-index: 1;
+}
+
+.component-demo-surface:hover {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ms-color-sky-400) 32%, transparent),
+    0 22px 48px rgba(57, 87, 66, 0.16);
 }
 
 .component-feature-list,
@@ -700,7 +914,9 @@
   display: grid;
   gap: var(--ms-space-3);
   min-height: 17rem;
+  overflow: hidden;
   padding: var(--ms-space-4);
+  position: relative;
 }
 
 .prop-preview__label {
@@ -862,6 +1078,121 @@
   }
   50% {
     transform: translateX(0.9rem);
+  }
+}
+
+@keyframes page-mana-drift {
+  0%,
+  100% {
+    filter: saturate(0.96);
+    transform: translate3d(-0.6rem, -0.4rem, 0) scale(1);
+  }
+  50% {
+    filter: saturate(1.16);
+    transform: translate3d(0.8rem, 0.5rem, 0) scale(1.03);
+  }
+}
+
+@keyframes sun-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes glyph-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes comet-cut {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-24deg);
+  }
+  12%,
+  34% {
+    opacity: 0.95;
+  }
+  52%,
+  100% {
+    opacity: 0;
+    transform: translate3d(62rem, 18rem, 0) rotate(-24deg);
+  }
+}
+
+@keyframes mote-rise {
+  0%,
+  100% {
+    opacity: 0.32;
+    transform: translate3d(0, 0.8rem, 0) scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(0.8rem, -2.4rem, 0) scale(1.18);
+  }
+}
+
+@keyframes spell-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.72) rotate(0deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.34) rotate(28deg);
+  }
+}
+
+@keyframes grass-sway {
+  0%,
+  100% {
+    transform: translateX(-0.18rem);
+  }
+  50% {
+    transform: translateX(0.28rem);
+  }
+}
+
+@keyframes preview-mana-sweep {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: translateX(-1.8rem);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateX(1.8rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell::after,
+  .anime-stage__wash,
+  .anime-stage__cloud,
+  .anime-stage__sun,
+  .anime-stage__glyph,
+  .anime-stage__comet,
+  .anime-stage__mote,
+  .anime-stage__grass,
+  .anime-stage__spell-flash,
+  .component-demo-surface::before,
+  .prop-preview::before {
+    animation: none;
+  }
+
+  .anime-stage,
+  .anime-window,
+  .component-menu__item,
+  .component-demo-surface {
+    transition: none;
   }
 }
 

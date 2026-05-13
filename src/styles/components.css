@@ -10,6 +10,7 @@
   letter-spacing: 0;
   line-height: 1;
   min-width: 2.5rem;
+  overflow: hidden;
   position: relative;
   transition:
     transform var(--ms-motion-fast),
@@ -18,14 +19,50 @@
   white-space: nowrap;
 }
 
+.ms-button::before,
+.ms-button::after {
+  content: "";
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--ms-motion-fast), transform 520ms ease;
+}
+
+.ms-button::before {
+  background:
+    radial-gradient(circle at 24% 24%, rgba(255, 250, 240, 0.72), transparent 0.48rem),
+    linear-gradient(120deg, transparent 0 30%, rgba(255, 250, 240, 0.52) 46%, transparent 62%);
+  transform: translateX(-72%) skewX(-18deg);
+}
+
+.ms-button::after {
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ms-color-sky-400) 42%, transparent),
+    0 0 26px color-mix(in srgb, var(--ms-color-amber-400) 34%, transparent);
+}
+
 .ms-button:hover {
-  box-shadow: var(--ms-shadow-1);
-  transform: translateY(-1px);
+  box-shadow:
+    var(--ms-shadow-1),
+    0 0 24px color-mix(in srgb, var(--ms-color-sky-400) 24%, transparent);
+  transform: translateY(-2px);
+}
+
+.ms-button:hover::before {
+  opacity: 1;
+  transform: translateX(72%) skewX(-18deg);
+}
+
+.ms-button:hover::after,
+.ms-button:focus-visible::after {
+  opacity: 1;
 }
 
 .ms-button:active {
   box-shadow: none;
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.985);
 }
 
 .ms-button:focus-visible,
@@ -76,6 +113,13 @@
 .ms-button__icon {
   display: inline-flex;
   flex: 0 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.ms-button__label {
+  position: relative;
+  z-index: 1;
 }
 
 .ms-accordion {

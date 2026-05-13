@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
@@ -767,6 +767,14 @@ function App() {
 }
 
 function HomePage({ setPage, t }: { setPage: (page: Page) => void; t: Copy }) {
+  const [spellBurst, setSpellBurst] = useState(0);
+  const [stagePointer, setStagePointer] = useState({ x: 50, y: 50 });
+  const stageStyle = {
+    "--spell-x": `${stagePointer.x}%`,
+    "--spell-y": `${stagePointer.y}%`,
+  } as CSSProperties;
+  const castSpell = () => setSpellBurst((value) => value + 1);
+
   return (
     <>
       <section className="hero-section">
@@ -775,20 +783,54 @@ function HomePage({ setPage, t }: { setPage: (page: Page) => void; t: Copy }) {
           <h1>{t.home.title}</h1>
           <p>{t.home.body}</p>
           <div className="hero-actions">
-            <Button icon={<Package size={16} />} onClick={() => setPage("install")}>
+            <Button
+              icon={<Package size={16} />}
+              onClick={() => {
+                castSpell();
+                setPage("install");
+              }}
+            >
               {t.home.install}
             </Button>
-            <Button variant="secondary" icon={<Sparkles size={16} />} onClick={() => setPage("components")}>
+            <Button
+              variant="secondary"
+              icon={<Sparkles size={16} />}
+              onClick={() => {
+                castSpell();
+                setPage("components");
+              }}
+            >
               {t.home.explore}
             </Button>
           </div>
         </div>
 
-        <div className="anime-stage" aria-label={t.home.stageLabel}>
+        <div
+          className="anime-stage"
+          aria-label={t.home.stageLabel}
+          onPointerLeave={() => setStagePointer({ x: 50, y: 50 })}
+          onPointerMove={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            setStagePointer({
+              x: Math.round(((event.clientX - rect.left) / rect.width) * 100),
+              y: Math.round(((event.clientY - rect.top) / rect.height) * 100),
+            });
+          }}
+          style={stageStyle}
+        >
           <div className="anime-stage__wash" />
           <div className="anime-stage__cloud anime-stage__cloud--one" />
           <div className="anime-stage__cloud anime-stage__cloud--two" />
           <div className="anime-stage__sun" />
+          <div className="anime-stage__mana-field" />
+          <div className="anime-stage__glyph anime-stage__glyph--one" />
+          <div className="anime-stage__glyph anime-stage__glyph--two" />
+          <div className="anime-stage__comet anime-stage__comet--one" />
+          <div className="anime-stage__comet anime-stage__comet--two" />
+          <div className="anime-stage__mote anime-stage__mote--one" />
+          <div className="anime-stage__mote anime-stage__mote--two" />
+          <div className="anime-stage__mote anime-stage__mote--three" />
+          {spellBurst > 0 ? <div className="anime-stage__spell-flash" key={spellBurst} /> : null}
           <div className="anime-stage__ridge anime-stage__ridge--far" />
           <div className="anime-stage__ridge anime-stage__ridge--near" />
           <div className="anime-stage__grass" />
@@ -804,10 +846,10 @@ function HomePage({ setPage, t }: { setPage: (page: Page) => void; t: Copy }) {
               <p>{t.home.panelBody}</p>
               <Progress value={72} label={t.home.readiness} />
               <div className="anime-window__actions">
-                <Button size="sm" icon={<Check size={14} />}>
+                <Button size="sm" icon={<Check size={14} />} onClick={castSpell}>
                   {t.home.save}
                 </Button>
-                <Button size="sm" variant="secondary" icon={<Wand2 size={14} />}>
+                <Button size="sm" variant="secondary" icon={<Wand2 size={14} />} onClick={castSpell}>
                   {t.home.tune}
                 </Button>
               </div>
