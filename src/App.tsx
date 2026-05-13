@@ -696,6 +696,35 @@ function isTrailInput(element: EventTarget | null): element is HTMLInputElement 
   return ["", "text", "search", "email", "password", "url", "tel"].includes(element.type);
 }
 
+let appMeasureCanvas: HTMLCanvasElement | undefined;
+
+function clampNumber(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function measureTextWidth(text: string, styles: CSSStyleDeclaration) {
+  appMeasureCanvas ??= document.createElement("canvas");
+  const context = appMeasureCanvas.getContext("2d");
+  if (!context) return text.length * Number.parseFloat(styles.fontSize || "16") * 0.56;
+
+  context.font =
+    styles.font ||
+    `${styles.fontStyle} ${styles.fontVariant} ${styles.fontWeight} ${styles.fontSize} ${styles.fontFamily}`;
+  return context.measureText(text).width;
+}
+
+function getInputCaretViewportX(field: HTMLInputElement | HTMLTextAreaElement, caret: number) {
+  const rect = field.getBoundingClientRect();
+  const styles = window.getComputedStyle(field);
+  const paddingLeft = Number.parseFloat(styles.paddingLeft || "0");
+  const paddingRight = Number.parseFloat(styles.paddingRight || "0");
+  const measuredText = measureTextWidth(field.value.slice(0, caret), styles);
+  const minX = rect.left + paddingLeft;
+  const maxX = rect.right - paddingRight;
+
+  return clampNumber(rect.left + paddingLeft + measuredText - field.scrollLeft, minX, maxX);
+}
+
 function App() {
   const [page, setPage] = useState<Page>("home");
   const [lang, setLang] = useState<Lang>(getInitialLang);
@@ -741,8 +770,7 @@ function App() {
     const rect = field.getBoundingClientRect();
     const valueLength = field.value.length;
     const caret = field.selectionStart ?? valueLength;
-    const visibleSlots = Math.max(valueLength, field.placeholder.length, 10);
-    const x = rect.left + 16 + (Math.min(caret, visibleSlots) / visibleSlots) * Math.max(rect.width - 32, 1);
+    const x = getInputCaretViewportX(field, caret);
     const y = rect.top + rect.height / 2;
     const id = window.performance.now();
     const tones: TypingTrail["tone"][] = ["bolt", "ember", "frost"];

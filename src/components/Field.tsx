@@ -9,6 +9,34 @@ export type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
 
 type FieldTrail = { id: number; x: string; tone: "bolt" | "ember" | "frost"; direction: "forward" | "backward" };
 
+let fieldMeasureCanvas: HTMLCanvasElement | undefined;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getTextWidth(text: string, styles: CSSStyleDeclaration) {
+  fieldMeasureCanvas ??= document.createElement("canvas");
+  const context = fieldMeasureCanvas.getContext("2d");
+  if (!context) return text.length * Number.parseFloat(styles.fontSize || "16") * 0.56;
+
+  context.font =
+    styles.font ||
+    `${styles.fontStyle} ${styles.fontVariant} ${styles.fontWeight} ${styles.fontSize} ${styles.fontFamily}`;
+  return context.measureText(text).width;
+}
+
+function getCaretX(field: HTMLInputElement, caret: number) {
+  const styles = window.getComputedStyle(field);
+  const paddingLeft = Number.parseFloat(styles.paddingLeft || "0");
+  const paddingRight = Number.parseFloat(styles.paddingRight || "0");
+  const measuredText = getTextWidth(field.value.slice(0, caret), styles);
+  const minX = paddingLeft;
+  const maxX = Math.max(minX, field.clientWidth - paddingRight);
+
+  return clamp(paddingLeft + measuredText - field.scrollLeft, minX, maxX);
+}
+
 export function Field({ className = "", id, label, hint, error, required, disabled, onInput, ...props }: FieldProps) {
   const [trails, setTrails] = useState<FieldTrail[]>([]);
   const previousCaret = useRef(0);
@@ -21,7 +49,7 @@ export function Field({ className = "", id, label, hint, error, required, disabl
     const field = event.currentTarget;
     const valueLength = field.value.length;
     const caret = field.selectionStart ?? valueLength;
-    const visibleSlots = Math.max(valueLength, field.placeholder.length, 10);
+    const caretX = getCaretX(field, caret);
     const id = window.performance.now();
     const tones: FieldTrail["tone"][] = ["bolt", "ember", "frost"];
     const inputType = (event.nativeEvent as InputEvent).inputType ?? "";
@@ -33,7 +61,7 @@ export function Field({ className = "", id, label, hint, error, required, disabl
       {
         id,
         direction,
-        x: `${(Math.min(caret, visibleSlots) / visibleSlots) * 100}%`,
+        x: `${caretX}px`,
         tone: tones[Math.floor(id) % tones.length],
       },
     ]);
