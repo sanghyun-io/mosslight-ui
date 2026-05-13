@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { useState } from "react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useRef, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Badge, Button, Card, Dialog, Field, Select, Switch, Tabs, Toast, ToastViewport } from "../index";
 
@@ -50,7 +50,7 @@ describe("core components", () => {
     expect(control).toBeChecked();
   });
 
-  it("changes Tabs panel content", () => {
+  it("changes Tabs panel content with keyboard navigation", () => {
     render(
       <Tabs
         items={[
@@ -60,21 +60,41 @@ describe("core components", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("tab", { name: "Calm" }));
+    fireEvent.keyDown(screen.getByRole("tablist"), { key: "ArrowRight" });
 
     expect(screen.getByRole("tabpanel")).toHaveTextContent("Calm content");
   });
 
-  it("closes Dialog through the close button", () => {
+  it("traps focus inside Dialog and restores focus after close", async () => {
     function DialogHarness() {
-      const [open, setOpen] = useState(true);
-      return <Dialog open={open} title="Prepare satchel" onOpenChange={setOpen}>Dialog body</Dialog>;
+      const [open, setOpen] = useState(false);
+      const firstButtonRef = useRef<HTMLButtonElement>(null);
+
+      return (
+        <>
+          <button onClick={() => setOpen(true)}>Open dialog</button>
+          <Dialog open={open} title="Prepare satchel" initialFocusRef={firstButtonRef} onOpenChange={setOpen}>
+            <button ref={firstButtonRef}>First action</button>
+            <button>Second action</button>
+          </Dialog>
+        </>
+      );
     }
 
     render(<DialogHarness />);
-    fireEvent.click(screen.getAllByRole("button", { name: "Close dialog" })[1]);
+    const opener = screen.getByRole("button", { name: "Open dialog" });
+    opener.focus();
+    fireEvent.click(opener);
+    await waitFor(() => expect(screen.getByRole("button", { name: "First action" })).toHaveFocus());
+
+    screen.getByRole("button", { name: "Second action" }).focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(screen.getAllByRole("button", { name: "Close dialog" })[1]).toHaveFocus();
+
+    fireEvent.keyDown(document, { key: "Escape" });
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(opener).toHaveFocus();
   });
 
   it("renders Toast inside a viewport", () => {

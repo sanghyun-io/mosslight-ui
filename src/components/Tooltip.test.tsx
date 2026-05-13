@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Button } from "./Button";
 import { Tooltip } from "./Tooltip";
 
@@ -16,5 +16,20 @@ describe("Tooltip", () => {
 
     fireEvent.blur(screen.getByRole("button", { name: "Save" }));
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
+
+  it("keeps child event handlers intact", () => {
+    const onFocus = vi.fn();
+
+    render(
+      <Tooltip content="Save route">
+        <button onFocus={onFocus}>Save</button>
+      </Tooltip>,
+    );
+
+    fireEvent.focus(screen.getByRole("button", { name: "Save" }));
+
+    expect(onFocus).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
   });
 });
