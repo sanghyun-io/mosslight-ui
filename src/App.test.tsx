@@ -109,4 +109,29 @@ describe("component props playground", () => {
     expect(screen.getByRole("status", { name: "Syncing route" })).toBeInTheDocument();
     expect(screen.getByText(/label="Syncing route"/)).toBeInTheDocument();
   });
+
+  it("keeps Switch preview isolated from the base example", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: "Components" }));
+    const menu = screen.getByLabelText("Component list");
+    await user.click(within(menu).getByText("Switch").closest("button") as HTMLButtonElement);
+
+    const baseSwitch = screen.getByLabelText("Campfire mode");
+    const propSwitch = screen.getByLabelText("checked");
+    const playground = screen.getByText("Switch props").closest("article") as HTMLElement;
+    const previewSwitch = within(playground).getByLabelText("Switch label");
+
+    expect(baseSwitch).toBeChecked();
+    expect(propSwitch).toBeChecked();
+    expect(previewSwitch).toBeChecked();
+
+    await user.click(previewSwitch);
+
+    expect(baseSwitch).toBeChecked();
+    expect(propSwitch).not.toBeChecked();
+    expect(previewSwitch).not.toBeChecked();
+    expect(within(playground).getByText(/checked={false}/)).toBeInTheDocument();
+  });
 });

@@ -959,8 +959,9 @@ function getPlayground(
         controls: [controls.required, controls.disabled, controls.hasHint, controls.error],
         preview: (
           <Field
-            label="Traveler"
-            placeholder="Fern"
+            id="playground-field"
+            label="Input label"
+            placeholder="Typed value"
             required={Boolean(props.required)}
             disabled={Boolean(props.disabled)}
             hint={props.hasHint ? "Hint text is controlled by the hint prop." : undefined}
@@ -973,7 +974,8 @@ function getPlayground(
         controls: [controls.choice, controls.required, controls.disabled, controls.hasHint, controls.error],
         preview: (
           <Select
-            label="Region"
+            id="playground-select"
+            label="Select label"
             required={Boolean(props.required)}
             disabled={Boolean(props.disabled)}
             hint={props.hasHint ? "Hint text is controlled by the hint prop." : undefined}
@@ -993,7 +995,8 @@ function getPlayground(
         controls: [controls.checked, controls.disabled, controls.hasHint],
         preview: (
           <Checkbox
-            label="Remember route"
+            id="playground-checkbox"
+            label="Checkbox label"
             checked={Boolean(props.checked)}
             disabled={Boolean(props.disabled)}
             hint={props.hasHint ? "The hint prop renders helper text." : undefined}
@@ -1006,7 +1009,8 @@ function getPlayground(
         controls: [controls.checked, controls.disabled],
         preview: (
           <Switch
-            label="Campfire mode"
+            id="playground-switch"
+            label="Switch label"
             checked={Boolean(props.checked)}
             disabled={Boolean(props.disabled)}
             onChange={(event) => setProp("checked", event.currentTarget.checked)}
@@ -1018,7 +1022,7 @@ function getPlayground(
         controls: [controls.choice, controls.disabled],
         preview: (
           <RadioGroup
-            label="Density"
+            label="Radio group label"
             name="playground-density"
             value={String(props.choice)}
             disabled={Boolean(props.disabled)}
@@ -1036,7 +1040,8 @@ function getPlayground(
         controls: [controls.value, controls.max, controls.hasLabel],
         preview: (
           <Slider
-            label="Ambient glow"
+            id="playground-slider"
+            label="Slider label"
             min={0}
             max={max}
             value={Math.min(value, max)}
@@ -1236,8 +1241,8 @@ function getPlaygroundCode(id: string, props: PlaygroundProps) {
       ].filter(Boolean).join("\n");
     case "field":
       return jsxSnippet("Field", [
-        `label="Traveler"`,
-        `placeholder="Fern"`,
+        `label="Input label"`,
+        `placeholder="Typed value"`,
         booleanProp("required", Boolean(props.required), false),
         booleanProp("disabled", Boolean(props.disabled), false),
         hasHint ? `hint="Hint text is controlled by the hint prop."` : null,
@@ -1246,7 +1251,7 @@ function getPlaygroundCode(id: string, props: PlaygroundProps) {
     case "select":
       return [
         `<Select`,
-        `  label="Region"`,
+        `  label="Select label"`,
         `  value="${choice}"`,
         `  onChange={(event) => setValue(event.currentTarget.value)}`,
         propLine(booleanProp("required", Boolean(props.required), false)),
@@ -1262,7 +1267,7 @@ function getPlaygroundCode(id: string, props: PlaygroundProps) {
       ].filter(Boolean).join("\n");
     case "checkbox":
       return jsxSnippet("Checkbox", [
-        `label="Remember route"`,
+        `label="Checkbox label"`,
         expressionProp("checked", Boolean(props.checked)),
         booleanProp("disabled", Boolean(props.disabled), false),
         hasHint ? `hint="The hint prop renders helper text."` : null,
@@ -1270,7 +1275,7 @@ function getPlaygroundCode(id: string, props: PlaygroundProps) {
       ]);
     case "switch":
       return jsxSnippet("Switch", [
-        `label="Campfire mode"`,
+        `label="Switch label"`,
         expressionProp("checked", Boolean(props.checked)),
         booleanProp("disabled", Boolean(props.disabled), false),
         `onChange={(event) => setChecked(event.currentTarget.checked)}`,
@@ -1278,7 +1283,7 @@ function getPlaygroundCode(id: string, props: PlaygroundProps) {
     case "radio-group":
       return [
         `<RadioGroup`,
-        `  label="Density"`,
+        `  label="Radio group label"`,
         `  name="density"`,
         `  value="${choice}"`,
         propLine(booleanProp("disabled", Boolean(props.disabled), false)),
@@ -1292,7 +1297,7 @@ function getPlaygroundCode(id: string, props: PlaygroundProps) {
       ].filter(Boolean).join("\n");
     case "slider":
       return jsxSnippet("Slider", [
-        `label="Ambient glow"`,
+        `label="Slider label"`,
         expressionProp("min", 0),
         expressionProp("max", max),
         expressionProp("value", boundedValue),
