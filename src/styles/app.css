@@ -159,6 +159,19 @@
     0 18px 48px rgba(57, 87, 66, 0.18);
 }
 
+.site-shell[data-lang="ko"] .hero-copy h1 {
+  font-size: clamp(3rem, 5.25vw, 5.25rem);
+  line-height: 1.08;
+  max-width: 10.8em;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+.site-shell[data-lang="ko"] .hero-copy p,
+.site-shell[data-lang="ko"] .page-heading p {
+  word-break: keep-all;
+}
+
 .hero-copy p,
 .page-heading p,
 .anime-window p,
@@ -493,6 +506,42 @@
 .component-sidebar__intro {
   display: grid;
   gap: var(--ms-space-2);
+}
+
+.component-sidebar__list {
+  display: grid;
+  gap: var(--ms-space-5);
+  max-height: calc(100vh - 14rem);
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: var(--ms-space-2);
+  scrollbar-color: color-mix(in srgb, var(--ms-color-moss-500) 58%, transparent)
+    color-mix(in srgb, var(--ms-color-paper) 58%, transparent);
+  scrollbar-width: thin;
+}
+
+.component-sidebar__list::-webkit-scrollbar {
+  width: 0.62rem;
+}
+
+.component-sidebar__list::-webkit-scrollbar-track {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--ms-color-paper) 72%, transparent), transparent),
+    color-mix(in srgb, var(--ms-color-moss-100) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ms-text-primary) 12%, transparent);
+  border-radius: var(--ms-radius-pill);
+}
+
+.component-sidebar__list::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(180deg, var(--ms-color-moss-500), color-mix(in srgb, var(--ms-color-sky-400) 64%, var(--ms-color-moss-500))),
+    var(--ms-color-moss-500);
+  border: 2px solid color-mix(in srgb, var(--ms-color-paper) 76%, transparent);
+  border-radius: var(--ms-radius-pill);
+}
+
+.component-sidebar__list::-webkit-scrollbar-thumb:hover {
+  background: var(--ms-color-moss-700);
 }
 
 .component-sidebar__intro p,
@@ -844,6 +893,12 @@
     position: static;
   }
 
+  .component-sidebar__list {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
   .component-menu {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -879,6 +934,11 @@
 
   .anime-stage {
     min-height: 25rem;
+  }
+
+  .site-shell[data-lang="ko"] .hero-copy h1 {
+    font-size: clamp(2.7rem, 14vw, 4.5rem);
+    max-width: 100%;
   }
 
   .anime-window {

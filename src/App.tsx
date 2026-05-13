@@ -703,7 +703,7 @@ function App() {
   }, [lang]);
 
   return (
-    <main className="site-shell" data-ms-theme={dark ? "dark" : undefined}>
+    <main className="site-shell" data-lang={lang} data-ms-theme={dark ? "dark" : undefined}>
       <header className="site-header">
         <button className="site-brand" type="button" onClick={() => setPage("home")}>
           <span className="site-brand__mark" aria-hidden="true">
@@ -875,27 +875,29 @@ function ComponentsPage({
               {t.components.primitives.startsWith(" ") ? t.components.primitives : ` ${t.components.primitives}`}
             </p>
           </div>
-          {groups.map((group) => (
-            <div className="component-menu-group" key={group}>
-              <h2>{t.components.groups[group]}</h2>
-              <div className="component-menu">
-                {componentCatalog
-                  .filter((component) => component.group === group)
-                  .map((component) => (
-                    <button
-                      className="component-menu__item"
-                      type="button"
-                      key={component.id}
-                      aria-current={selectedComponent.id === component.id ? "true" : undefined}
-                      onClick={() => setActiveComponent(component.id)}
-                    >
-                      <span>{component.label}</span>
-                      <small>{t.componentMeta[component.id as keyof Copy["componentMeta"]].features[0]}</small>
-                    </button>
-                  ))}
+          <div className="component-sidebar__list">
+            {groups.map((group) => (
+              <div className="component-menu-group" key={group}>
+                <h2>{t.components.groups[group]}</h2>
+                <div className="component-menu">
+                  {componentCatalog
+                    .filter((component) => component.group === group)
+                    .map((component) => (
+                      <button
+                        className="component-menu__item"
+                        type="button"
+                        key={component.id}
+                        aria-current={selectedComponent.id === component.id ? "true" : undefined}
+                        onClick={() => setActiveComponent(component.id)}
+                      >
+                        <span>{component.label}</span>
+                        <small>{t.componentMeta[component.id as keyof Copy["componentMeta"]].features[0]}</small>
+                      </button>
+                    ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </aside>
 
         <div className="component-main">
