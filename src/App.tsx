@@ -61,17 +61,29 @@ function markCaptureCloneSafe(documentClone: Document) {
   const style = documentClone.createElement("style");
   style.textContent = `
     .site-shell,
-    .site-shell * {
+    .site-shell *,
+    .site-shell *::before,
+    .site-shell *::after {
+      accent-color: #6f8f6f !important;
+      background: transparent !important;
       background-image: none !important;
+      background-color: transparent !important;
       border-color: rgba(37, 49, 55, 0.22) !important;
       box-shadow: none !important;
       color: #253137 !important;
       filter: none !important;
+      outline-color: rgba(37, 49, 55, 0.28) !important;
+      text-decoration-color: rgba(37, 49, 55, 0.28) !important;
       text-shadow: none !important;
     }
 
+    .site-shell *::before,
+    .site-shell *::after {
+      content: none !important;
+    }
+
     .site-shell {
-      background: #f4efdf !important;
+      background: transparent !important;
     }
 
     .site-header,
@@ -97,6 +109,19 @@ function markCaptureCloneSafe(documentClone: Document) {
     }
   `;
   documentClone.head.appendChild(style);
+
+  const clonedShell = documentClone.querySelector(".site-shell") as HTMLElement | null;
+  if (!clonedShell) return;
+
+  clonedShell.querySelectorAll<HTMLElement>("*").forEach((element) => {
+    element.style.setProperty("background-image", "none", "important");
+    element.style.setProperty("box-shadow", "none", "important");
+    element.style.setProperty("filter", "none", "important");
+    element.style.setProperty("text-shadow", "none", "important");
+    element.style.setProperty("color", "#253137", "important");
+    element.style.setProperty("border-color", "rgba(37, 49, 55, 0.22)", "important");
+    element.style.setProperty("outline-color", "rgba(37, 49, 55, 0.28)", "important");
+  });
 }
 
 const pages: Array<{ value: Page }> = [
@@ -912,9 +937,6 @@ function App() {
       setCursorTrails((current) => current.filter((trail) => trail.id !== id));
     }, 520);
     lastCursorPoint.current = { x: event.clientX, y: event.clientY, time: now };
-    if (warpPoint.active) {
-      setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
-    }
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
@@ -1157,26 +1179,6 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
-    const drawArc = (
-      x: number,
-      y: number,
-      radius: number,
-      start: number,
-      end: number,
-      color: string,
-      lineWidth: number,
-      blur: number,
-    ) => {
-      context.beginPath();
-      context.arc(x, y, radius, start, end);
-      context.strokeStyle = color;
-      context.lineWidth = lineWidth;
-      context.lineCap = "round";
-      context.shadowBlur = blur;
-      context.shadowColor = color;
-      context.stroke();
-    };
-
     const drawWarpedCapture = (x: number, y: number, radius: number, seconds: number, charge: number) => {
       const capture = captureRef.current;
       if (!capture) return;
@@ -1184,75 +1186,86 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
       const metrics = captureMetricsRef.current;
       const sourceScaleX = capture.width / Math.max(metrics.width, 1);
       const sourceScaleY = capture.height / Math.max(metrics.height, 1);
-      const tile = charge > 0.7 ? 3.5 : 4.5;
       const swirl = seconds * (3.8 + charge * 2.8);
 
       context.save();
       context.beginPath();
       context.arc(x, y, radius, 0, Math.PI * 2);
       context.clip();
-      context.globalAlpha = 0.96;
       context.globalCompositeOperation = "source-over";
+      context.imageSmoothingEnabled = true;
+      context.globalAlpha = 0.72;
 
-      for (let dy = -radius; dy <= radius; dy += tile) {
-        for (let dx = -radius; dx <= radius; dx += tile) {
-          const px = x + dx;
-          const py = y + dy;
-          const distance = Math.hypot(dx, dy);
-          if (distance > radius) continue;
+      const captureLeft = metrics.left - window.scrollX;
+      const captureTop = metrics.top - window.scrollY;
+      for (let step = 0; step < 9; step += 1) {
+        const progress = (step + 1) / 9;
+        const scale = 1 - progress * (0.46 + charge * 0.18);
+        const turn = progress * progress * (0.16 + charge * 0.12) * Math.sin(seconds * 1.4);
+        const destWidth = metrics.width * scale;
+        const destHeight = metrics.height * scale;
+        const destX = x - (x - captureLeft) * scale + Math.cos(turn) * progress * 7;
+        const destY = y - (y - captureTop) * scale + Math.sin(turn) * progress * 7;
 
-          const falloff = 1 - distance / radius;
-          const pull = falloff * falloff * (1.1 + charge * 1.05);
-          const crease = Math.sin(falloff * 22 + seconds * 8.2 + Math.atan2(dy, dx) * 3) * 0.22 * pull;
-          const angle = Math.atan2(dy, dx) + pull * 5.6 + swirl * pull * 0.36 + crease;
-          const sourceDistance = distance * (1 + pull * 3.15) + pull * 34;
-          const squeeze = 1 - falloff * (0.22 + charge * 0.12);
-          const sourceViewportX = x + Math.cos(angle) * sourceDistance;
-          const sourceViewportY = y + Math.sin(angle) * sourceDistance * squeeze;
-          const sourcePageX = clampNumber(window.scrollX + sourceViewportX, metrics.left, metrics.left + metrics.width - 1);
-          const sourcePageY = clampNumber(window.scrollY + sourceViewportY, metrics.top, metrics.top + metrics.height - 1);
-          const sx = (sourcePageX - metrics.left) * sourceScaleX;
-          const sy = (sourcePageY - metrics.top) * sourceScaleY;
-          const sizeX = (tile + 2) * sourceScaleX;
-          const sizeY = (tile + 2) * sourceScaleY;
-          const drawSize = tile + 2.4 + falloff * 2.4;
-
-          context.drawImage(capture, sx, sy, sizeX, sizeY, px - falloff, py - falloff, drawSize, drawSize);
-          if (pull > 0.18) {
-            context.globalCompositeOperation = "screen";
-            context.globalAlpha = Math.min(0.24, pull * 0.13);
-            context.drawImage(capture, sx + pull * 7.5, sy, sizeX, sizeY, px - 1.4, py, drawSize, drawSize);
-            context.drawImage(capture, sx - pull * 7.5, sy, sizeX, sizeY, px + 1.4, py, drawSize, drawSize);
-            context.globalAlpha = 0.96;
-            context.globalCompositeOperation = "source-over";
-          }
-        }
+        context.save();
+        context.globalAlpha = 0.055 + progress * 0.025;
+        context.filter = `blur(${progress * 2.2}px)`;
+        context.translate(x, y);
+        context.rotate(turn);
+        context.translate(-x, -y);
+        context.drawImage(capture, 0, 0, capture.width, capture.height, destX, destY, destWidth, destHeight);
+        context.restore();
       }
 
-      context.globalCompositeOperation = "screen";
-      for (let index = 0; index < 54; index += 1) {
-        const lane = 38 + index * 5.2;
-        const spiral = index * 0.62 + seconds * (2.4 + charge * 1.6);
-        const fold = 1 - Math.min(lane / radius, 1);
-        const sx = (clampNumber(window.scrollX + x + Math.cos(spiral + fold * 4.8) * lane, metrics.left, metrics.left + metrics.width - 1) - metrics.left) * sourceScaleX;
-        const sy = (clampNumber(window.scrollY + y + Math.sin(spiral + fold * 4.8) * lane, metrics.top, metrics.top + metrics.height - 1) - metrics.top) * sourceScaleY;
-        const targetDistance = lane * (0.78 - fold * 0.34);
-        const tx = x + Math.cos(spiral - fold * 5.2) * targetDistance;
-        const ty = y + Math.sin(spiral - fold * 5.2) * targetDistance;
-        const size = 8 + fold * 14;
-        context.globalAlpha = fold * 0.14;
-        context.drawImage(capture, sx, sy, 12 * sourceScaleX, 12 * sourceScaleY, tx - size / 2, ty - size / 2, size, size);
+      context.globalCompositeOperation = "source-over";
+      for (let index = 0; index < 132; index += 1) {
+        const ring = index % 44;
+        const lane = Math.floor(index / 44);
+        const sourceDistance = 64 + ring * 8.6 + lane * 22;
+        const fold = 1 - Math.min(sourceDistance / radius, 1);
+        if (fold <= 0) continue;
+
+        const sourceAngle = index * 2.399 + lane * 0.5 + seconds * (0.5 + charge * 0.22);
+        const targetAngle = sourceAngle - fold * (3.4 + charge * 1.8) - swirl * fold * 0.06;
+        const sourcePageX = clampNumber(
+          window.scrollX + x + Math.cos(sourceAngle) * sourceDistance,
+          metrics.left,
+          metrics.left + metrics.width - 1,
+        );
+        const sourcePageY = clampNumber(
+          window.scrollY + y + Math.sin(sourceAngle) * sourceDistance,
+          metrics.top,
+          metrics.top + metrics.height - 1,
+        );
+        const sx = (sourcePageX - metrics.left) * sourceScaleX;
+        const sy = (sourcePageY - metrics.top) * sourceScaleY;
+        const targetDistance = sourceDistance * (0.58 - fold * 0.48);
+        const tx = x + Math.cos(targetAngle) * targetDistance;
+        const ty = y + Math.sin(targetAngle) * targetDistance;
+        const sourceSize = (22 + fold * 46) * Math.max(sourceScaleX, sourceScaleY);
+        const targetWidth = 32 + fold * 96;
+        const targetHeight = 8 + fold * 22;
+
+        context.save();
+        context.globalAlpha = Math.min(0.42, 0.08 + fold * 0.28);
+        context.filter = `blur(${Math.max(0.4, fold * 2.6)}px)`;
+        context.translate(tx, ty);
+        context.rotate(targetAngle + Math.PI * 0.5);
+        context.drawImage(
+          capture,
+          sx - sourceSize / 2,
+          sy - sourceSize / 2,
+          sourceSize,
+          sourceSize,
+          -targetWidth / 2,
+          -targetHeight / 2,
+          targetWidth,
+          targetHeight,
+        );
+        context.restore();
       }
+      context.filter = "none";
       context.globalAlpha = 1;
-
-      context.globalCompositeOperation = "multiply";
-      const compression = context.createRadialGradient(x, y, 0, x, y, radius);
-      compression.addColorStop(0, "rgba(0, 0, 0, 0.9)");
-      compression.addColorStop(0.24, "rgba(18, 16, 28, 0.42)");
-      compression.addColorStop(0.58, "rgba(46, 56, 74, 0.16)");
-      compression.addColorStop(1, "rgba(255, 255, 255, 0)");
-      context.fillStyle = compression;
-      context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
 
       context.restore();
     };
@@ -1269,63 +1282,9 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
         const activeFor = Math.min(1, Math.max(0, seconds - activeStartedRef.current));
         const pulse = Math.sin(seconds * 7.4) * 0.5 + 0.5;
         const charge = Math.min(1, 0.3 + activeFor * 1.2);
-        const radius = 218 + charge * 82 + pulse * 16;
+        const radius = 290 + charge * 132 + pulse * 18;
 
         drawWarpedCapture(x, y, radius, seconds, charge);
-
-        context.globalCompositeOperation = "source-over";
-        const lens = context.createRadialGradient(x, y, 0, x, y, radius);
-        lens.addColorStop(0, "rgba(0, 0, 0, 0.98)");
-        lens.addColorStop(0.08, "rgba(4, 5, 10, 0.95)");
-        lens.addColorStop(0.17, "rgba(18, 15, 31, 0.7)");
-        lens.addColorStop(0.42, "rgba(35, 28, 52, 0.34)");
-        lens.addColorStop(0.74, "rgba(61, 78, 106, 0.12)");
-        lens.addColorStop(1, "rgba(0, 0, 0, 0)");
-        context.fillStyle = lens;
-        context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-
-        context.globalCompositeOperation = "screen";
-        context.save();
-        context.translate(x, y);
-        context.rotate(seconds * 0.86);
-        context.translate(-x, -y);
-        drawArc(x - 1.4, y + 0.8, 52, 0.34, 4.7, "rgba(69, 183, 210, 0.46)", 1.4, 18);
-        drawArc(x + 1.2, y - 0.6, 78, 2.8, 7.1, "rgba(128, 76, 152, 0.42)", 1.4, 16);
-        drawArc(x, y, 124, 0.8, 2.7, "rgba(221, 227, 242, 0.28)", 1, 12);
-        drawArc(x, y, 176, 3.1, 6.2, "rgba(80, 108, 148, 0.2)", 0.9, 10);
-        context.restore();
-
-        context.save();
-        context.translate(x, y);
-        context.rotate(-seconds * 0.52);
-        context.translate(-x, -y);
-        for (let index = 0; index < 42; index += 1) {
-          const angle = index * 2.399 + seconds * (0.65 + (index % 5) * 0.045);
-          const lane = ((seconds * 38 + index * 11.7) % 122) + 20;
-          const inner = lane * (0.68 + (index % 3) * 0.035);
-          const outer = lane + 18 + (index % 4) * 5;
-          const alpha = Math.max(0, 0.32 - lane / 440);
-          context.beginPath();
-          context.moveTo(x + Math.cos(angle) * outer, y + Math.sin(angle) * outer);
-          context.lineTo(x + Math.cos(angle - 0.14) * inner, y + Math.sin(angle - 0.14) * inner);
-          context.strokeStyle = `rgba(214, 221, 238, ${alpha})`;
-          context.lineWidth = index % 6 === 0 ? 1.1 : 0.55;
-          context.shadowBlur = 10;
-          context.shadowColor = "rgba(89, 112, 156, 0.26)";
-          context.stroke();
-        }
-        context.restore();
-
-        context.globalCompositeOperation = "source-over";
-        const core = context.createRadialGradient(x, y, 0, x, y, 28);
-        core.addColorStop(0, "rgba(0, 0, 0, 1)");
-        core.addColorStop(0.42, "rgba(3, 4, 8, 0.96)");
-        core.addColorStop(0.74, "rgba(31, 24, 45, 0.5)");
-        core.addColorStop(1, "rgba(0, 0, 0, 0)");
-        context.fillStyle = core;
-        context.beginPath();
-        context.arc(x, y, 30, 0, Math.PI * 2);
-        context.fill();
       } else {
         activeStartedRef.current = null;
       }
