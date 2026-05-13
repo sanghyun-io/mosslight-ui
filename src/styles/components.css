@@ -672,16 +672,21 @@
   background: var(--ms-color-plum-500);
 }
 
-.ms-field {
+.ms-field,
+.ms-form-control {
   display: grid;
   gap: var(--ms-space-2);
 }
 
 .ms-field__label,
+.ms-form-control__label,
 .ms-switch__label {
+  align-items: center;
   color: var(--ms-color-ink-800);
+  display: inline-flex;
   font-size: 0.88rem;
   font-weight: 800;
+  gap: var(--ms-space-1);
 }
 
 .ms-field__control {
@@ -697,9 +702,40 @@
   width: 100%;
 }
 
+.ms-field__control:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
 .ms-field__hint {
   color: var(--ms-color-ink-600);
   font-size: 0.78rem;
+}
+
+.ms-field__error,
+.ms-form-control__error {
+  color: var(--ms-color-rose-500);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.ms-form-control__hint {
+  color: var(--ms-color-ink-600);
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+.ms-form-control__error {
+  margin: 0;
+}
+
+.ms-field[data-invalid] .ms-field__control,
+.ms-form-control[data-invalid] .ms-field__control {
+  border-color: rgba(176, 99, 99, 0.72);
+}
+
+.ms-form-control[data-disabled] {
+  opacity: 0.68;
 }
 
 .ms-switch {
