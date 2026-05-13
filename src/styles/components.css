@@ -64,8 +64,8 @@
 }
 
 .ms-button--ghost {
-  background: rgba(255, 250, 240, 0.68);
-  color: var(--ms-color-ink-800);
+  background: var(--ms-surface-panel);
+  color: var(--ms-text-primary);
 }
 
 .ms-button--danger {
@@ -90,7 +90,7 @@
 
 .ms-accordion__trigger {
   align-items: center;
-  background: rgba(255, 250, 240, 0.76);
+  background: var(--ms-surface-panel);
   border: 0;
   color: var(--ms-color-ink-800);
   cursor: pointer;
@@ -122,15 +122,15 @@
 }
 
 .ms-accordion__panel {
-  background: rgba(246, 240, 223, 0.6);
-  color: var(--ms-color-ink-600);
+  background: var(--ms-surface-muted);
+  color: var(--ms-text-muted);
   line-height: 1.65;
   padding: var(--ms-space-4);
 }
 
 .ms-alert {
   align-items: flex-start;
-  background: var(--ms-color-paper);
+  background: var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-md);
   box-shadow: var(--ms-shadow-1);
@@ -154,7 +154,7 @@
 }
 
 .ms-alert p {
-  color: var(--ms-color-ink-600);
+  color: var(--ms-text-muted);
   line-height: 1.65;
   margin: var(--ms-space-1) 0 0;
 }
@@ -270,7 +270,7 @@
 
 .ms-checkbox__box {
   align-items: center;
-  background: rgba(255, 250, 240, 0.9);
+  background: var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: 5px;
   display: inline-flex;
@@ -317,7 +317,7 @@
 }
 
 .ms-checkbox__hint {
-  color: var(--ms-color-ink-600);
+  color: var(--ms-text-muted);
   font-size: 0.78rem;
   margin-top: 0.1rem;
 }
@@ -380,7 +380,7 @@
 
 .ms-radio {
   align-items: center;
-  background: rgba(255, 250, 240, 0.7);
+  background: var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-pill);
   cursor: pointer;
@@ -577,7 +577,7 @@
 }
 
 .ms-pagination__page {
-  background: rgba(255, 250, 240, 0.72);
+  background: var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-sm);
   cursor: pointer;
@@ -633,7 +633,7 @@
 
 .ms-card {
   align-content: start;
-  background: rgba(255, 250, 240, 0.86);
+  background: var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-md);
   box-shadow: var(--ms-shadow-1);
@@ -690,7 +690,7 @@
 }
 
 .ms-field__control {
-  background: rgba(255, 250, 240, 0.9);
+  background: var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-sm);
   color: var(--ms-color-ink-800);
@@ -708,7 +708,7 @@
 }
 
 .ms-field__hint {
-  color: var(--ms-color-ink-600);
+  color: var(--ms-text-muted);
   font-size: 0.78rem;
 }
 
@@ -720,7 +720,7 @@
 }
 
 .ms-form-control__hint {
-  color: var(--ms-color-ink-600);
+  color: var(--ms-text-muted);
   font-size: 0.78rem;
   margin: 0;
 }
@@ -805,7 +805,7 @@
   animation: ms-dialog-enter 180ms ease both;
   background:
     linear-gradient(180deg, rgba(228, 241, 242, 0.5), transparent 46%),
-    var(--ms-color-paper);
+    var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-md);
   box-shadow: var(--ms-shadow-2);
@@ -838,7 +838,7 @@
 .ms-dialog__header p,
 .ms-dialog__body,
 .ms-toast p {
-  color: var(--ms-color-ink-600);
+  color: var(--ms-text-muted);
   line-height: 1.65;
 }
 
@@ -860,7 +860,7 @@
 }
 
 .ms-select__wrap::after {
-  border-color: var(--ms-color-ink-600) transparent transparent;
+  border-color: var(--ms-text-muted) transparent transparent;
   border-style: solid;
   border-width: 6px 5px 0;
   content: "";
@@ -883,7 +883,7 @@
 
 .ms-tabs__list {
   align-items: center;
-  background: rgba(255, 250, 240, 0.64);
+  background: var(--ms-surface-muted);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-sm);
   display: inline-flex;
@@ -896,7 +896,7 @@
   background: transparent;
   border: 0;
   border-radius: 5px;
-  color: var(--ms-color-ink-600);
+  color: var(--ms-text-muted);
   cursor: pointer;
   font-weight: 800;
   min-height: 2rem;
@@ -914,10 +914,10 @@
 }
 
 .ms-tabs__panel {
-  background: rgba(255, 250, 240, 0.68);
+  background: var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-md);
-  color: var(--ms-color-ink-600);
+  color: var(--ms-text-muted);
   line-height: 1.65;
   min-height: 7rem;
   padding: var(--ms-space-4);
@@ -931,7 +931,7 @@
 }
 
 .ms-toast {
-  background: var(--ms-color-paper);
+  background: var(--ms-surface-panel);
   border: var(--ms-border-ink);
   border-radius: var(--ms-radius-md);
   box-shadow: var(--ms-shadow-1);
