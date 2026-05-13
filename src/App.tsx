@@ -903,18 +903,14 @@ function App() {
       className="site-shell"
       data-lang={lang}
       data-ms-theme={dark ? "dark" : undefined}
+      data-warping={warpPoint.active ? "true" : undefined}
       onInputCapture={castTypingTrail}
       onPointerCancelCapture={() => setWarpPoint((current) => ({ ...current, active: false }))}
       onPointerDownCapture={handlePointerDown}
       onPointerMoveCapture={castCursorTrail}
       onPointerUpCapture={() => setWarpPoint((current) => ({ ...current, active: false }))}
     >
-      <div
-        className="blackhole-warp"
-        aria-hidden="true"
-        data-active={warpPoint.active ? "true" : undefined}
-        style={{ "--warp-x": `${warpPoint.x}px`, "--warp-y": `${warpPoint.y}px` } as CSSProperties}
-      />
+      <NightHollowCanvas warpPoint={warpPoint} />
 
       <div className="cursor-trail-layer" aria-hidden="true">
         {cursorTrails.map((trail) => (
@@ -1020,6 +1016,141 @@ function App() {
       {page === "install" ? <InstallPage t={t} /> : null}
     </main>
   );
+}
+
+function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pointRef = useRef(warpPoint);
+
+  useEffect(() => {
+    pointRef.current = warpPoint;
+  }, [warpPoint]);
+
+  useEffect(() => {
+    if (import.meta.env.MODE === "test") return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return;
+
+    let animationFrame = 0;
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const drawArc = (
+      x: number,
+      y: number,
+      radius: number,
+      start: number,
+      end: number,
+      color: string,
+      lineWidth: number,
+      blur: number,
+    ) => {
+      context.beginPath();
+      context.arc(x, y, radius, start, end);
+      context.strokeStyle = color;
+      context.lineWidth = lineWidth;
+      context.lineCap = "round";
+      context.shadowBlur = blur;
+      context.shadowColor = color;
+      context.stroke();
+    };
+
+    const render = (time: number) => {
+      context.clearRect(0, 0, width, height);
+      const point = pointRef.current;
+
+      if (point.active) {
+        const x = point.x;
+        const y = point.y;
+        const seconds = time / 1000;
+        const pulse = Math.sin(seconds * 7.4) * 0.5 + 0.5;
+        const radius = 142 + pulse * 10;
+
+        context.globalCompositeOperation = "source-over";
+        const lens = context.createRadialGradient(x, y, 0, x, y, radius);
+        lens.addColorStop(0, "rgba(2, 3, 7, 0.96)");
+        lens.addColorStop(0.09, "rgba(8, 8, 15, 0.92)");
+        lens.addColorStop(0.18, "rgba(22, 18, 32, 0.62)");
+        lens.addColorStop(0.42, "rgba(39, 32, 54, 0.28)");
+        lens.addColorStop(0.78, "rgba(74, 92, 116, 0.08)");
+        lens.addColorStop(1, "rgba(0, 0, 0, 0)");
+        context.fillStyle = lens;
+        context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+
+        context.globalCompositeOperation = "screen";
+        context.save();
+        context.translate(x, y);
+        context.rotate(seconds * 0.86);
+        context.translate(-x, -y);
+        drawArc(x - 1.4, y + 0.8, 34, 0.34, 4.7, "rgba(69, 183, 210, 0.34)", 1.1, 16);
+        drawArc(x + 1.2, y - 0.6, 47, 2.8, 7.1, "rgba(128, 76, 152, 0.3)", 1.2, 14);
+        drawArc(x, y, 72, 0.8, 2.3, "rgba(221, 227, 242, 0.24)", 0.9, 12);
+        drawArc(x, y, 96, 3.3, 5.9, "rgba(80, 108, 148, 0.16)", 0.8, 8);
+        context.restore();
+
+        context.save();
+        context.translate(x, y);
+        context.rotate(-seconds * 0.52);
+        context.translate(-x, -y);
+        for (let index = 0; index < 42; index += 1) {
+          const angle = index * 2.399 + seconds * (0.65 + (index % 5) * 0.045);
+          const lane = ((seconds * 38 + index * 11.7) % 122) + 20;
+          const inner = lane * (0.68 + (index % 3) * 0.035);
+          const outer = lane + 18 + (index % 4) * 5;
+          const alpha = Math.max(0, 0.32 - lane / 440);
+          context.beginPath();
+          context.moveTo(x + Math.cos(angle) * outer, y + Math.sin(angle) * outer);
+          context.lineTo(x + Math.cos(angle - 0.14) * inner, y + Math.sin(angle - 0.14) * inner);
+          context.strokeStyle = `rgba(214, 221, 238, ${alpha})`;
+          context.lineWidth = index % 6 === 0 ? 1.1 : 0.55;
+          context.shadowBlur = 10;
+          context.shadowColor = "rgba(89, 112, 156, 0.26)";
+          context.stroke();
+        }
+        context.restore();
+
+        context.globalCompositeOperation = "source-over";
+        const core = context.createRadialGradient(x, y, 0, x, y, 28);
+        core.addColorStop(0, "rgba(0, 0, 0, 1)");
+        core.addColorStop(0.42, "rgba(3, 4, 8, 0.96)");
+        core.addColorStop(0.74, "rgba(31, 24, 45, 0.5)");
+        core.addColorStop(1, "rgba(0, 0, 0, 0)");
+        context.fillStyle = core;
+        context.beginPath();
+        context.arc(x, y, 30, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      animationFrame = window.requestAnimationFrame(render);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    animationFrame = window.requestAnimationFrame(render);
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
+  return <canvas className="night-hollow-canvas" ref={canvasRef} aria-hidden="true" />;
 }
 
 function HomePage({ setPage, t }: { setPage: (page: Page) => void; t: Copy }) {
