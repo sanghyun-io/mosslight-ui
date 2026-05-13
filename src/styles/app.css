@@ -54,7 +54,7 @@
 }
 
 .night-hollow-canvas {
-  mix-blend-mode: multiply;
+  mix-blend-mode: normal;
   z-index: 76;
 }
 
@@ -69,10 +69,6 @@
     filter 70ms linear,
     transform 70ms linear !important;
   will-change: filter, transform;
-}
-
-.site-shell[data-warping="true"] [data-warp-pulled="true"] {
-  z-index: 78;
 }
 
 .cursor-trail {

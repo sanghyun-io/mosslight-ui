@@ -1194,6 +1194,8 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const pointRef = useRef(warpPoint);
   const captureRef = useRef<HTMLCanvasElement | null>(null);
+  const captureMetricsRef = useRef({ scrollX: 0, scrollY: 0, width: 1, height: 1 });
+  const activeStartedRef = useRef<number | null>(null);
 
   useEffect(() => {
     pointRef.current = warpPoint;
@@ -1205,6 +1207,13 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
     let cancelled = false;
     const root = document.querySelector(".site-shell") as HTMLElement | null;
     if (!root) return;
+
+    captureMetricsRef.current = {
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+      width: Math.max(root.scrollWidth, window.innerWidth, 1),
+      height: Math.max(root.scrollHeight, window.innerHeight, 1),
+    };
 
     void html2canvas(root, {
       backgroundColor: null,
@@ -1272,19 +1281,21 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
       context.stroke();
     };
 
-    const drawWarpedCapture = (x: number, y: number, radius: number, seconds: number) => {
+    const drawWarpedCapture = (x: number, y: number, radius: number, seconds: number, charge: number) => {
       const capture = captureRef.current;
       if (!capture) return;
 
-      const sourceScale = capture.width / Math.max(width, 1);
-      const tile = 7;
-      const swirl = seconds * 1.18;
+      const metrics = captureMetricsRef.current;
+      const sourceScaleX = capture.width / Math.max(metrics.width, 1);
+      const sourceScaleY = capture.height / Math.max(metrics.height, 1);
+      const tile = charge > 0.7 ? 4 : 5;
+      const swirl = seconds * (2.8 + charge * 2.2);
 
       context.save();
       context.beginPath();
       context.arc(x, y, radius, 0, Math.PI * 2);
       context.clip();
-      context.globalAlpha = 0.88;
+      context.globalAlpha = 0.96;
       context.globalCompositeOperation = "source-over";
 
       for (let dy = -radius; dy <= radius; dy += tile) {
@@ -1295,25 +1306,39 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
           if (distance > radius) continue;
 
           const falloff = 1 - distance / radius;
-          const pull = falloff * falloff;
-          const angle = Math.atan2(dy, dx) + pull * 1.15 + swirl * pull * 0.22;
-          const sourceDistance = distance * (1 + pull * 0.7);
-          const chroma = pull * 2.8;
-          const sx = (x + Math.cos(angle) * sourceDistance) * sourceScale;
-          const sy = (y + Math.sin(angle) * sourceDistance) * sourceScale;
-          const size = (tile + 1) * sourceScale;
+          const pull = falloff * falloff * (0.8 + charge * 0.9);
+          const arm = Math.sin(falloff * 17 + seconds * 6.8) * 0.16 * pull;
+          const angle = Math.atan2(dy, dx) + pull * 4.2 + swirl * pull * 0.28 + arm;
+          const sourceDistance = distance * (1 + pull * 2.35) + pull * 18;
+          const squeeze = 1 - falloff * 0.18;
+          const sourceViewportX = x + Math.cos(angle) * sourceDistance;
+          const sourceViewportY = y + Math.sin(angle) * sourceDistance * squeeze;
+          const sx = (metrics.scrollX + sourceViewportX) * sourceScaleX;
+          const sy = (metrics.scrollY + sourceViewportY) * sourceScaleY;
+          const sizeX = (tile + 2) * sourceScaleX;
+          const sizeY = (tile + 2) * sourceScaleY;
+          const drawSize = tile + 2 + falloff * 1.6;
 
-          context.drawImage(capture, sx, sy, size, size, px, py, tile + 1, tile + 1);
-          if (pull > 0.34) {
+          context.drawImage(capture, sx, sy, sizeX, sizeY, px - falloff, py - falloff, drawSize, drawSize);
+          if (pull > 0.22) {
             context.globalCompositeOperation = "screen";
-            context.globalAlpha = pull * 0.12;
-            context.drawImage(capture, sx + chroma, sy, size, size, px - 0.8, py, tile + 1, tile + 1);
-            context.drawImage(capture, sx - chroma, sy, size, size, px + 0.8, py, tile + 1, tile + 1);
-            context.globalAlpha = 0.88;
+            context.globalAlpha = Math.min(0.22, pull * 0.16);
+            context.drawImage(capture, sx + pull * 5.2, sy, sizeX, sizeY, px - 1.2, py, drawSize, drawSize);
+            context.drawImage(capture, sx - pull * 5.2, sy, sizeX, sizeY, px + 1.2, py, drawSize, drawSize);
+            context.globalAlpha = 0.96;
             context.globalCompositeOperation = "source-over";
           }
         }
       }
+
+      context.globalCompositeOperation = "multiply";
+      const compression = context.createRadialGradient(x, y, 0, x, y, radius);
+      compression.addColorStop(0, "rgba(0, 0, 0, 0.9)");
+      compression.addColorStop(0.24, "rgba(18, 16, 28, 0.42)");
+      compression.addColorStop(0.58, "rgba(46, 56, 74, 0.16)");
+      compression.addColorStop(1, "rgba(255, 255, 255, 0)");
+      context.fillStyle = compression;
+      context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
 
       context.restore();
     };
@@ -1326,18 +1351,21 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
         const x = point.x;
         const y = point.y;
         const seconds = time / 1000;
+        if (activeStartedRef.current === null) activeStartedRef.current = seconds;
+        const activeFor = Math.min(1, Math.max(0, seconds - activeStartedRef.current));
         const pulse = Math.sin(seconds * 7.4) * 0.5 + 0.5;
-        const radius = 142 + pulse * 10;
+        const charge = Math.min(1, 0.3 + activeFor * 1.2);
+        const radius = 218 + charge * 82 + pulse * 16;
 
-        drawWarpedCapture(x, y, radius * 0.86, seconds);
+        drawWarpedCapture(x, y, radius, seconds, charge);
 
         context.globalCompositeOperation = "source-over";
         const lens = context.createRadialGradient(x, y, 0, x, y, radius);
-        lens.addColorStop(0, "rgba(2, 3, 7, 0.96)");
-        lens.addColorStop(0.09, "rgba(8, 8, 15, 0.92)");
-        lens.addColorStop(0.18, "rgba(22, 18, 32, 0.62)");
-        lens.addColorStop(0.42, "rgba(39, 32, 54, 0.28)");
-        lens.addColorStop(0.78, "rgba(74, 92, 116, 0.08)");
+        lens.addColorStop(0, "rgba(0, 0, 0, 0.98)");
+        lens.addColorStop(0.08, "rgba(4, 5, 10, 0.95)");
+        lens.addColorStop(0.17, "rgba(18, 15, 31, 0.7)");
+        lens.addColorStop(0.42, "rgba(35, 28, 52, 0.34)");
+        lens.addColorStop(0.74, "rgba(61, 78, 106, 0.12)");
         lens.addColorStop(1, "rgba(0, 0, 0, 0)");
         context.fillStyle = lens;
         context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
@@ -1347,10 +1375,10 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
         context.translate(x, y);
         context.rotate(seconds * 0.86);
         context.translate(-x, -y);
-        drawArc(x - 1.4, y + 0.8, 34, 0.34, 4.7, "rgba(69, 183, 210, 0.34)", 1.1, 16);
-        drawArc(x + 1.2, y - 0.6, 47, 2.8, 7.1, "rgba(128, 76, 152, 0.3)", 1.2, 14);
-        drawArc(x, y, 72, 0.8, 2.3, "rgba(221, 227, 242, 0.24)", 0.9, 12);
-        drawArc(x, y, 96, 3.3, 5.9, "rgba(80, 108, 148, 0.16)", 0.8, 8);
+        drawArc(x - 1.4, y + 0.8, 52, 0.34, 4.7, "rgba(69, 183, 210, 0.46)", 1.4, 18);
+        drawArc(x + 1.2, y - 0.6, 78, 2.8, 7.1, "rgba(128, 76, 152, 0.42)", 1.4, 16);
+        drawArc(x, y, 124, 0.8, 2.7, "rgba(221, 227, 242, 0.28)", 1, 12);
+        drawArc(x, y, 176, 3.1, 6.2, "rgba(80, 108, 148, 0.2)", 0.9, 10);
         context.restore();
 
         context.save();
@@ -1384,6 +1412,8 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
         context.beginPath();
         context.arc(x, y, 30, 0, Math.PI * 2);
         context.fill();
+      } else {
+        activeStartedRef.current = null;
       }
 
       animationFrame = window.requestAnimationFrame(render);
