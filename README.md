@@ -89,6 +89,7 @@ See [THEMING.md](./THEMING.md) for token names and density options.
 - `Checkbox`
 - `Dialog`
 - `Field`
+- `FormControl`
 - `Pagination`
 - `Progress`
 - `RadioGroup`
@@ -110,6 +111,12 @@ The npm package surface is validated with:
 ```bash
 npm run build
 npm pack --dry-run
+```
+
+For the full pre-release gate:
+
+```bash
+npm run release:check
 ```
 
 ## Design Notes

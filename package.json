@@ -12,6 +12,9 @@
   "bugs": {
     "url": "https://github.com/sanghyun-io/mosslight-ui/issues"
   },
+  "engines": {
+    "node": ">=20.19"
+  },
   "keywords": [
     "react",
     "ui",
@@ -47,6 +50,8 @@
     "build:demo": "tsc --noEmit -p tsconfig.json && vite build",
     "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json && node scripts/finalize-package.mjs",
     "prepare": "npm run build:lib",
+    "prepublishOnly": "npm run release:check",
+    "release:check": "npm test && npm run build && node scripts/verify-dist.mjs && npm run build-storybook && npm pack --dry-run",
     "test": "vitest run",
     "preview": "vite preview --host 127.0.0.1",
     "storybook": "storybook dev -p 6006 --host 127.0.0.1",
