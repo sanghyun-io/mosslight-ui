@@ -49,28 +49,195 @@ const pages: Array<{ label: string; value: Page }> = [
   { label: "Install", value: "install" },
 ];
 
-const componentGroups = [
+type ComponentTone = "moss" | "sky" | "amber" | "plum";
+
+type ComponentMeta = {
+  id: string;
+  label: string;
+  group: "Actions" | "Forms" | "Structure" | "Feedback";
+  tone: ComponentTone;
+  summary: string;
+  features: string[];
+};
+
+const componentCatalog: ComponentMeta[] = [
   {
-    title: "Actions",
-    items: ["Button", "Badge", "Tooltip", "Toast"],
+    id: "button",
+    label: "Button",
+    group: "Actions",
     tone: "moss",
+    summary: "Primary, secondary, ghost, danger variants with icon and size support.",
+    features: ["Variants", "Sizes", "Icons"],
   },
   {
-    title: "Forms",
-    items: ["Field", "Select", "Checkbox", "Switch", "RadioGroup", "Slider"],
+    id: "badge",
+    label: "Badge",
+    group: "Actions",
+    tone: "moss",
+    summary: "Compact status labels for categories, tags, and state hints.",
+    features: ["Tone variants", "Inline rhythm", "High-contrast border"],
+  },
+  {
+    id: "tooltip",
+    label: "Tooltip",
+    group: "Actions",
+    tone: "moss",
+    summary: "Small contextual notes for icon-only or compact controls.",
+    features: ["Hover content", "Keyboard focus", "Compact placement"],
+  },
+  {
+    id: "toast",
+    label: "Toast",
+    group: "Actions",
+    tone: "moss",
+    summary: "Non-blocking status feedback with title, body, and optional action.",
+    features: ["Tone variants", "Viewport wrapper", "Action slot"],
+  },
+  {
+    id: "field",
+    label: "Field",
+    group: "Forms",
     tone: "sky",
+    summary: "Text input with label, hint, error, disabled, and required states.",
+    features: ["Hint text", "Error state", "Required marker"],
   },
   {
-    title: "Structure",
-    items: ["Card", "Accordion", "Tabs", "Breadcrumb", "Pagination", "Separator"],
+    id: "select",
+    label: "Select",
+    group: "Forms",
+    tone: "sky",
+    summary: "Native select styling with the same form control system as Field.",
+    features: ["Options", "Hint text", "Error state"],
+  },
+  {
+    id: "checkbox",
+    label: "Checkbox",
+    group: "Forms",
+    tone: "sky",
+    summary: "Checkbox control with label and helper text for small decisions.",
+    features: ["Checked state", "Hint text", "Disabled state"],
+  },
+  {
+    id: "switch",
+    label: "Switch",
+    group: "Forms",
+    tone: "sky",
+    summary: "Binary setting control for preferences and feature toggles.",
+    features: ["On/off state", "Label support", "Keyboard input"],
+  },
+  {
+    id: "radio-group",
+    label: "RadioGroup",
+    group: "Forms",
+    tone: "sky",
+    summary: "Grouped single-choice selection with shared label and name.",
+    features: ["Default value", "Controlled value", "Grouped semantics"],
+  },
+  {
+    id: "slider",
+    label: "Slider",
+    group: "Forms",
+    tone: "sky",
+    summary: "Range input for numeric tuning with visible output text.",
+    features: ["Min/max", "Controlled value", "Output label"],
+  },
+  {
+    id: "card",
+    label: "Card",
+    group: "Structure",
     tone: "amber",
+    summary: "Framed content surface with accent color support.",
+    features: ["Accent variants", "Article semantics", "Stacked content"],
   },
   {
-    title: "Feedback",
-    items: ["Alert", "Dialog", "Progress", "Skeleton", "Spinner", "Avatar"],
-    tone: "plum",
+    id: "accordion",
+    label: "Accordion",
+    group: "Structure",
+    tone: "amber",
+    summary: "Collapsible disclosure sections with keyboard navigation.",
+    features: ["Default open item", "Collapsible mode", "Arrow key support"],
   },
-] as const;
+  {
+    id: "tabs",
+    label: "Tabs",
+    group: "Structure",
+    tone: "amber",
+    summary: "Tabbed sections for switching related panels in one surface.",
+    features: ["Automatic/manual activation", "Keyboard navigation", "Panel linkage"],
+  },
+  {
+    id: "breadcrumb",
+    label: "Breadcrumb",
+    group: "Structure",
+    tone: "amber",
+    summary: "Hierarchical path display for multi-level app screens.",
+    features: ["Current page", "Custom separator", "Link props"],
+  },
+  {
+    id: "pagination",
+    label: "Pagination",
+    group: "Structure",
+    tone: "amber",
+    summary: "Page navigation control with previous, next, and numbered pages.",
+    features: ["Controlled page", "Disabled edges", "Page buttons"],
+  },
+  {
+    id: "separator",
+    label: "Separator",
+    group: "Structure",
+    tone: "amber",
+    summary: "Horizontal or vertical divider for dense tool surfaces.",
+    features: ["Orientation", "Decorative mode", "ARIA separator mode"],
+  },
+  {
+    id: "alert",
+    label: "Alert",
+    group: "Feedback",
+    tone: "plum",
+    summary: "Persistent message block for warnings, success, and status context.",
+    features: ["Title", "Icon slot", "Tone variants"],
+  },
+  {
+    id: "dialog",
+    label: "Dialog",
+    group: "Feedback",
+    tone: "plum",
+    summary: "Modal surface with title, description, footer, and focus return behavior.",
+    features: ["Controlled open", "Footer actions", "Escape close"],
+  },
+  {
+    id: "progress",
+    label: "Progress",
+    group: "Feedback",
+    tone: "plum",
+    summary: "Linear progress meter for loading, completion, and readiness states.",
+    features: ["Value/max", "Optional label", "ARIA progressbar"],
+  },
+  {
+    id: "skeleton",
+    label: "Skeleton",
+    group: "Feedback",
+    tone: "plum",
+    summary: "Placeholder blocks for loading text and content regions.",
+    features: ["Text variant", "Block variant", "Reduced layout shift"],
+  },
+  {
+    id: "spinner",
+    label: "Spinner",
+    group: "Feedback",
+    tone: "plum",
+    summary: "Compact loading indicator with accessible label text.",
+    features: ["Sizes", "Accessible label", "Inline use"],
+  },
+  {
+    id: "avatar",
+    label: "Avatar",
+    group: "Feedback",
+    tone: "plum",
+    summary: "User image or initials for people, authors, and account surfaces.",
+    features: ["Image fallback", "Initials", "Sizes"],
+  },
+];
 
 const tokens = [
   ["Parchment", "var(--ms-color-parchment)"],
@@ -234,88 +401,85 @@ function ComponentsPage({
   setGlow: (value: number) => void;
   setPaginationPage: (page: number) => void;
 }) {
+  const [activeComponent, setActiveComponent] = useState(componentCatalog[0].id);
+  const selectedComponent =
+    componentCatalog.find((component) => component.id === activeComponent) ?? componentCatalog[0];
+  const groups = Array.from(new Set(componentCatalog.map((component) => component.group)));
+
   return (
     <section className="page-shell">
       <PageHeading
         eyebrow="Components"
-        title="A broader primitive set for real app surfaces."
-        body="The public page now shows more of the package instead of hiding everything behind Storybook."
+        title="Browse each primitive one at a time."
+        body="Pick a component from the left panel, inspect its core behavior, then compare it with a composed product example."
       />
 
-      <div className="component-groups">
-        {componentGroups.map((group) => (
-          <Card accent={group.tone} key={group.title}>
-            <Badge tone={group.tone}>{group.title}</Badge>
-            <div className="component-tags">
-              {group.items.map((item) => (
-                <span key={item}>{item}</span>
+      <div className="component-browser">
+        <aside className="component-sidebar" aria-label="Component list">
+          <div className="component-sidebar__intro">
+            <Badge tone="moss">Catalog</Badge>
+            <p>{componentCatalog.length} primitives</p>
+          </div>
+          {groups.map((group) => (
+            <div className="component-menu-group" key={group}>
+              <h2>{group}</h2>
+              <div className="component-menu">
+                {componentCatalog
+                  .filter((component) => component.group === group)
+                  .map((component) => (
+                    <button
+                      className="component-menu__item"
+                      type="button"
+                      key={component.id}
+                      aria-current={selectedComponent.id === component.id ? "true" : undefined}
+                      onClick={() => setActiveComponent(component.id)}
+                    >
+                      <span>{component.label}</span>
+                      <small>{component.features[0]}</small>
+                    </button>
+                  ))}
+              </div>
+            </div>
+          ))}
+        </aside>
+
+        <div className="component-main">
+          <Card accent={selectedComponent.tone} className="component-detail-card">
+            <div className="component-detail__header">
+              <div>
+                <Badge tone={selectedComponent.tone}>{selectedComponent.group}</Badge>
+                <h2>{selectedComponent.label}</h2>
+                <p>{selectedComponent.summary}</p>
+              </div>
+            </div>
+
+            <div className="component-demo-surface">
+              {renderComponentDemo(selectedComponent.id, {
+                dialogOpen,
+                glow,
+                paginationPage,
+                setDialogOpen,
+                setGlow,
+                setPaginationPage,
+              })}
+            </div>
+
+            <div className="component-feature-list" aria-label={`${selectedComponent.label} features`}>
+              {selectedComponent.features.map((feature) => (
+                <span key={feature}>{feature}</span>
               ))}
             </div>
           </Card>
-        ))}
-      </div>
 
-      <div className="showcase-grid">
-        <Card accent="moss">
-          <Badge tone="moss">Forms</Badge>
-          <div className="stack">
-            <Field label="Traveler" placeholder="Fern" hint="Clear focus, compact spacing." />
-            <Select
-              label="Region"
-              defaultValue="lake"
-              options={[
-                { label: "Lake village", value: "lake" },
-                { label: "North ridge", value: "north" },
-                { label: "Old woods", value: "woods" },
-              ]}
-            />
-            <Checkbox label="Remember route" hint="Small helper text remains legible." defaultChecked />
-            <Switch label="Campfire mode" defaultChecked />
-          </div>
-        </Card>
-
-        <Card accent="sky">
-          <Badge tone="sky">Controls</Badge>
-          <RadioGroup
-            label="Density"
-            name="density"
-            defaultValue="comfortable"
-            options={[
-              { label: "Compact", value: "compact" },
-              { label: "Comfortable", value: "comfortable" },
-            ]}
+          <CompositeExample
+            dialogOpen={dialogOpen}
+            glow={glow}
+            paginationPage={paginationPage}
+            setDialogOpen={setDialogOpen}
+            setGlow={setGlow}
+            setPaginationPage={setPaginationPage}
           />
-          <Slider label="Ambient glow" min={20} max={100} value={glow} output={`${glow}%`} onChange={(event) => setGlow(Number(event.currentTarget.value))} />
-          <Pagination page={paginationPage} totalPages={4} onPageChange={setPaginationPage} />
-        </Card>
-
-        <Card accent="plum">
-          <Badge tone="plum">Feedback</Badge>
-          <Alert title="Draft saved" tone="plum" icon={<Sparkles size={18} />}>
-            Status feedback stays calm and close to the task.
-          </Alert>
-          <ToastViewport>
-            <Toast title="Journey saved" tone="plum">
-              Quiet messages, soft contrast, no harsh flashes.
-            </Toast>
-          </ToastViewport>
-          <Button variant="secondary" onClick={() => setDialogOpen(true)}>
-            Open dialog
-          </Button>
-        </Card>
-      </div>
-
-      <div className="utility-strip">
-        <Avatar name="Fern Vale" size="lg" />
-        <Separator orientation="vertical" decorative />
-        <Skeleton variant="text" />
-        <Skeleton variant="block" />
-        <Spinner label="Loading preview" />
-        <Tooltip content="Tooltip uses keyboard and hover interactions.">
-          <button className="utility-help" type="button">
-            ?
-          </button>
-        </Tooltip>
+        </div>
       </div>
 
       <Dialog
@@ -337,6 +501,272 @@ function ComponentsPage({
         </p>
       </Dialog>
     </section>
+  );
+}
+
+function renderComponentDemo(
+  id: string,
+  state: {
+    dialogOpen: boolean;
+    glow: number;
+    paginationPage: number;
+    setDialogOpen: (open: boolean) => void;
+    setGlow: (value: number) => void;
+    setPaginationPage: (page: number) => void;
+  },
+) {
+  switch (id) {
+    case "button":
+      return (
+        <div className="demo-row">
+          <Button icon={<Check size={16} />}>Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="danger">Danger</Button>
+        </div>
+      );
+    case "badge":
+      return (
+        <div className="demo-row">
+          <Badge tone="moss">Moss</Badge>
+          <Badge tone="sky">Sky</Badge>
+          <Badge tone="amber">Amber</Badge>
+          <Badge tone="plum">Plum</Badge>
+        </div>
+      );
+    case "tooltip":
+      return (
+        <Tooltip content="Soft contextual copy for compact controls.">
+          <button className="utility-help" type="button">
+            ?
+          </button>
+        </Tooltip>
+      );
+    case "toast":
+      return (
+        <ToastViewport>
+          <Toast title="Journey saved" tone="plum" action={<Button size="sm">Undo</Button>}>
+            Quiet messages, soft contrast, no harsh flashes.
+          </Toast>
+        </ToastViewport>
+      );
+    case "field":
+      return (
+        <div className="demo-stack">
+          <Field label="Traveler" placeholder="Fern" hint="Clear focus, compact spacing." />
+          <Field label="Route code" value="north-07" error="Route is already assigned." readOnly />
+        </div>
+      );
+    case "select":
+      return (
+        <Select
+          label="Region"
+          defaultValue="lake"
+          hint="Native select, styled with Mosslight tokens."
+          options={[
+            { label: "Lake village", value: "lake" },
+            { label: "North ridge", value: "north" },
+            { label: "Old woods", value: "woods" },
+          ]}
+        />
+      );
+    case "checkbox":
+      return (
+        <div className="demo-stack">
+          <Checkbox label="Remember route" hint="Small helper text remains legible." defaultChecked />
+          <Checkbox label="Require review" />
+        </div>
+      );
+    case "switch":
+      return (
+        <div className="demo-stack">
+          <Switch label="Campfire mode" defaultChecked />
+          <Switch label="Reduce motion" />
+        </div>
+      );
+    case "radio-group":
+      return (
+        <RadioGroup
+          label="Density"
+          name="component-density"
+          defaultValue="comfortable"
+          options={[
+            { label: "Compact", value: "compact" },
+            { label: "Comfortable", value: "comfortable" },
+            { label: "Spacious", value: "spacious" },
+          ]}
+        />
+      );
+    case "slider":
+      return (
+        <Slider
+          label="Ambient glow"
+          min={20}
+          max={100}
+          value={state.glow}
+          output={`${state.glow}%`}
+          onChange={(event) => state.setGlow(Number(event.currentTarget.value))}
+        />
+      );
+    case "card":
+      return (
+        <div className="demo-card-grid">
+          <Card accent="moss">
+            <Badge tone="moss">Moss</Badge>
+            <p>Grounded surface for settings and actions.</p>
+          </Card>
+          <Card accent="plum">
+            <Badge tone="plum">Plum</Badge>
+            <p>Soft feedback surface for status messages.</p>
+          </Card>
+        </div>
+      );
+    case "accordion":
+      return (
+        <Accordion
+          items={[
+            { title: "Install package", value: "install", content: "Import the React component and CSS bundle." },
+            { title: "Pick tokens", value: "tokens", content: "Start with surface, text, accent, and focus tokens." },
+            { title: "Compose screens", value: "compose", content: "Use primitives for forms, modals, and feedback." },
+          ]}
+        />
+      );
+    case "tabs":
+      return (
+        <Tabs
+          items={[
+            { label: "Light", value: "light", content: "Parchment surfaces, moss actions, sky focus." },
+            { label: "Dark", value: "dark", content: "Muted ink surfaces with luminous accent tokens." },
+            { label: "Motion", value: "motion", content: "Restrained ambient transitions for quiet product screens." },
+          ]}
+        />
+      );
+    case "breadcrumb":
+      return (
+        <Breadcrumb
+          items={[
+            { label: "Mosslight", href: "#" },
+            { label: "Components", href: "#" },
+            { label: "Breadcrumb", current: true },
+          ]}
+        />
+      );
+    case "pagination":
+      return (
+        <Pagination
+          page={state.paginationPage}
+          totalPages={5}
+          onPageChange={state.setPaginationPage}
+        />
+      );
+    case "separator":
+      return (
+        <div className="separator-demo">
+          <span>Before</span>
+          <Separator orientation="vertical" decorative />
+          <span>After</span>
+        </div>
+      );
+    case "alert":
+      return (
+        <Alert title="Draft saved" tone="plum" icon={<Sparkles size={18} />}>
+          Persistent status context stays close to the affected surface.
+        </Alert>
+      );
+    case "dialog":
+      return (
+        <Button variant="secondary" onClick={() => state.setDialogOpen(true)}>
+          Open dialog
+        </Button>
+      );
+    case "progress":
+      return <Progress value={72} label="Readiness" />;
+    case "skeleton":
+      return (
+        <div className="demo-stack">
+          <Skeleton variant="text" />
+          <Skeleton variant="block" />
+        </div>
+      );
+    case "spinner":
+      return <Spinner label="Loading preview" size="lg" />;
+    case "avatar":
+      return (
+        <div className="demo-row">
+          <Avatar name="Fern Vale" size="sm" />
+          <Avatar name="Stark North" />
+          <Avatar name="Moss Sage" size="lg" />
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
+function CompositeExample({
+  glow,
+  paginationPage,
+  setDialogOpen,
+  setGlow,
+  setPaginationPage,
+}: {
+  dialogOpen: boolean;
+  glow: number;
+  paginationPage: number;
+  setDialogOpen: (open: boolean) => void;
+  setGlow: (value: number) => void;
+  setPaginationPage: (page: number) => void;
+}) {
+  return (
+    <Card accent="moss" className="composite-card">
+      <div className="component-detail__header">
+        <div>
+          <Badge tone="moss">Combined example</Badge>
+          <h2>Journey settings panel</h2>
+          <p>Several primitives working together as one app surface.</p>
+        </div>
+        <Avatar name="Fern Vale" />
+      </div>
+
+      <div className="composite-layout">
+        <div className="stack">
+          <Field label="Traveler" placeholder="Fern" hint="Shared form spacing." />
+          <Select
+            label="Region"
+            defaultValue="lake"
+            options={[
+              { label: "Lake village", value: "lake" },
+              { label: "North ridge", value: "north" },
+              { label: "Old woods", value: "woods" },
+            ]}
+          />
+          <Checkbox label="Remember route" defaultChecked />
+          <Switch label="Campfire mode" defaultChecked />
+        </div>
+
+        <div className="stack">
+          <Alert title="Draft saved" tone="plum" icon={<Sparkles size={18} />}>
+            Feedback, actions, and form controls share the same token system.
+          </Alert>
+          <Slider
+            label="Ambient glow"
+            min={20}
+            max={100}
+            value={glow}
+            output={`${glow}%`}
+            onChange={(event) => setGlow(Number(event.currentTarget.value))}
+          />
+          <Progress value={glow} label="Mood balance" />
+          <Pagination page={paginationPage} totalPages={4} onPageChange={setPaginationPage} />
+          <div className="demo-row">
+            <Button icon={<Check size={16} />}>Save</Button>
+            <Button variant="secondary" onClick={() => setDialogOpen(true)}>
+              Review
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 }
 
