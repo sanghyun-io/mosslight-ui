@@ -939,6 +939,85 @@
   width: 100%;
 }
 
+.ms-field__control-shell {
+  display: grid;
+  position: relative;
+}
+
+.ms-field__control-shell .ms-field__control {
+  grid-area: 1 / 1;
+}
+
+.ms-field__trail {
+  animation: ms-field-trail-chase 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  height: 2.2rem;
+  left: calc(var(--field-trail-x) - 6rem);
+  mix-blend-mode: screen;
+  overflow: visible;
+  pointer-events: none;
+  position: absolute;
+  top: calc(50% - 1.1rem);
+  width: 7.5rem;
+  z-index: 2;
+}
+
+.ms-field__trail::before,
+.ms-field__trail::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+}
+
+.ms-field__trail::before {
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--field-trail-color, var(--ms-color-sky-400)) 86%, white), transparent),
+    repeating-linear-gradient(90deg, transparent 0 0.55rem, rgba(255, 250, 240, 0.7) 0.6rem 0.66rem, transparent 0.72rem 0.98rem);
+  border-radius: var(--ms-radius-pill);
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--field-trail-color, var(--ms-color-sky-400)) 58%, transparent),
+    0 0 28px color-mix(in srgb, var(--field-trail-color, var(--ms-color-sky-400)) 34%, transparent);
+  height: 0.28rem;
+  left: 0;
+  top: calc(50% - 0.14rem);
+  width: 100%;
+}
+
+.ms-field__trail::after {
+  animation: ms-field-caret-dodge 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  background:
+    radial-gradient(circle, rgba(255, 250, 240, 0.96) 0 0.22rem, transparent 0.3rem),
+    conic-gradient(from 110deg, transparent, var(--field-trail-color, var(--ms-color-sky-400)), transparent 42%, rgba(255, 250, 240, 0.86), transparent 68%);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--field-trail-color, var(--ms-color-sky-400)) 68%, transparent));
+  height: 1.9rem;
+  right: -0.94rem;
+  top: calc(50% - 0.95rem);
+  width: 1.9rem;
+}
+
+.ms-field__trail--bolt {
+  --field-trail-color: var(--ms-color-sky-400);
+}
+
+.ms-field__trail--ember {
+  --field-trail-color: var(--ms-color-amber-400);
+}
+
+.ms-field__trail--frost {
+  --field-trail-color: #9ed8ef;
+}
+
+.ms-field__trail--backward {
+  animation-name: ms-field-trail-retreat;
+  left: var(--field-trail-x);
+}
+
+.ms-field__trail--backward::after {
+  animation-name: ms-field-caret-backstep;
+  left: -0.94rem;
+  right: auto;
+}
+
 .ms-field__control:hover:not(:disabled) {
   box-shadow: 0 0 20px color-mix(in srgb, var(--ms-color-sky-400) 18%, transparent);
   transform: translateY(-1px);
@@ -1358,6 +1437,70 @@
   }
 }
 
+@keyframes ms-field-trail-chase {
+  0% {
+    opacity: 0;
+    transform: translateX(-0.8rem) scaleX(0.2);
+  }
+  14% {
+    opacity: 1;
+    transform: translateX(-0.12rem) scaleX(1.08);
+  }
+  34% {
+    filter: contrast(1.45) brightness(1.14);
+    transform: translateX(0.08rem) scaleX(0.92);
+  }
+  100% {
+    opacity: 0;
+    filter: contrast(1) brightness(1);
+    transform: translateX(0.7rem) scaleX(0.34);
+  }
+}
+
+@keyframes ms-field-caret-dodge {
+  0% {
+    transform: translateX(-0.8rem) rotate(-28deg) scale(0.76);
+  }
+  18% {
+    transform: translateX(0.12rem) rotate(10deg) scale(1.08);
+  }
+  100% {
+    transform: translateX(1.1rem) rotate(52deg) scale(0.28);
+  }
+}
+
+@keyframes ms-field-trail-retreat {
+  0% {
+    opacity: 0;
+    transform: translateX(0.8rem) scaleX(0.2);
+  }
+  14% {
+    opacity: 1;
+    transform: translateX(0.12rem) scaleX(1.08);
+  }
+  34% {
+    filter: contrast(1.45) brightness(1.14);
+    transform: translateX(-0.08rem) scaleX(0.92);
+  }
+  100% {
+    opacity: 0;
+    filter: contrast(1) brightness(1);
+    transform: translateX(-0.7rem) scaleX(0.34);
+  }
+}
+
+@keyframes ms-field-caret-backstep {
+  0% {
+    transform: translateX(0.8rem) rotate(28deg) scale(0.76);
+  }
+  18% {
+    transform: translateX(-0.12rem) rotate(-10deg) scale(1.08);
+  }
+  100% {
+    transform: translateX(-1.1rem) rotate(-52deg) scale(0.28);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ms-accordion,
   .ms-accordion__trigger,
@@ -1373,6 +1516,7 @@
   .ms-dialog__panel,
   .ms-dialog__scrim,
   .ms-field__control,
+  .ms-field__trail,
   .ms-pagination__page,
   .ms-progress__bar,
   .ms-progress__track::after,

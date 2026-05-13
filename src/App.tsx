@@ -1,5 +1,5 @@
-import type { CSSProperties, PointerEvent, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import type { CSSProperties, FormEvent, PointerEvent, ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   Check,
@@ -43,6 +43,14 @@ import {
 type Page = "home" | "components" | "patterns" | "tokens" | "install";
 type Lang = "en" | "ko";
 type SpellImpact = { id: number; x: number; y: number };
+type TypingTrail = {
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  tone: "bolt" | "ember" | "frost";
+  direction: "forward" | "backward";
+};
 
 const pages: Array<{ value: Page }> = [
   { value: "home" },
@@ -681,6 +689,13 @@ function getInitialLang(): Lang {
   return browserLanguages.some((language) => language.toLowerCase().startsWith("ko")) ? "ko" : "en";
 }
 
+function isTrailInput(element: EventTarget | null): element is HTMLInputElement | HTMLTextAreaElement {
+  if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) return false;
+  if (element instanceof HTMLTextAreaElement) return true;
+
+  return ["", "text", "search", "email", "password", "url", "tel"].includes(element.type);
+}
+
 function App() {
   const [page, setPage] = useState<Page>("home");
   const [lang, setLang] = useState<Lang>(getInitialLang);
@@ -693,6 +708,8 @@ function App() {
   const [paginationPage, setPaginationPage] = useState(2);
   const [glow, setGlow] = useState(68);
   const [spellImpacts, setSpellImpacts] = useState<SpellImpact[]>([]);
+  const [typingTrails, setTypingTrails] = useState<TypingTrail[]>([]);
+  const previousCaretByField = useRef(new WeakMap<HTMLInputElement | HTMLTextAreaElement, number>());
   const t = copy[lang];
 
   useEffect(() => {
@@ -716,11 +733,40 @@ function App() {
     }, 820);
   };
 
+  const castTypingTrail = (event: FormEvent<HTMLElement>) => {
+    if (!isTrailInput(event.target)) return;
+    if (event.target.closest(".ms-field")) return;
+
+    const field = event.target;
+    const rect = field.getBoundingClientRect();
+    const valueLength = field.value.length;
+    const caret = field.selectionStart ?? valueLength;
+    const visibleSlots = Math.max(valueLength, field.placeholder.length, 10);
+    const x = rect.left + 16 + (Math.min(caret, visibleSlots) / visibleSlots) * Math.max(rect.width - 32, 1);
+    const y = rect.top + rect.height / 2;
+    const id = window.performance.now();
+    const tones: TypingTrail["tone"][] = ["bolt", "ember", "frost"];
+    const tone = tones[Math.floor(id) % tones.length];
+    const previousCaret = previousCaretByField.current.get(field) ?? 0;
+    const inputType = (event.nativeEvent as InputEvent).inputType ?? "";
+    const direction = inputType.includes("delete") || caret < previousCaret ? "backward" : "forward";
+    previousCaretByField.current.set(field, caret);
+
+    setTypingTrails((current) => [
+      ...current.slice(-9),
+      { id, direction, x, y, width: Math.min(190, Math.max(88, rect.width * 0.34)), tone },
+    ]);
+    window.setTimeout(() => {
+      setTypingTrails((current) => current.filter((trail) => trail.id !== id));
+    }, 680);
+  };
+
   return (
     <main
       className="site-shell"
       data-lang={lang}
       data-ms-theme={dark ? "dark" : undefined}
+      onInputCapture={castTypingTrail}
       onPointerDownCapture={castInteractionSpell}
     >
       <div className="spell-impact-layer" aria-hidden="true">
@@ -729,6 +775,23 @@ function App() {
             className="spell-impact"
             key={impact.id}
             style={{ "--impact-x": `${impact.x}px`, "--impact-y": `${impact.y}px` } as CSSProperties}
+          />
+        ))}
+      </div>
+
+      <div className="typing-spell-layer" aria-hidden="true">
+        {typingTrails.map((trail) => (
+          <span
+            className={`typing-spell typing-spell--${trail.tone}`}
+            data-direction={trail.direction}
+            key={trail.id}
+            style={
+              {
+                "--typing-x": `${trail.x}px`,
+                "--typing-y": `${trail.y}px`,
+                "--typing-width": `${trail.width}px`,
+              } as CSSProperties
+            }
           />
         ))}
       </div>
