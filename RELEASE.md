@@ -20,12 +20,15 @@ Publishing to npm:
 npm publish
 ```
 
-Publishing through GitHub Actions:
+Publishing through GitHub Actions with npm trusted publishing:
 
-1. Create an npm automation token with publish access.
-2. Add it to the GitHub repository as the `NPM_TOKEN` Actions secret.
+1. On npmjs.com, add a trusted publisher for the package.
+2. Use these GitHub Actions values:
+   - Organization or user: `sanghyun-io`
+   - Repository: `mosslight-ui`
+   - Workflow filename: `publish.yml`
 3. Run the `Publish to npm` workflow manually from GitHub Actions.
 
-The workflow runs `npm publish --provenance`, and `prepublishOnly` runs the full `release:check` gate before the package is published.
+The workflow uses GitHub Actions OIDC instead of a long-lived npm token. npm automatically generates provenance for trusted publishing, and `prepublishOnly` runs the full `release:check` gate before the package is published.
 
 The package name `mosslight-ui` was available when the initial public repository was created. Re-check the registry before the first npm publish.
