@@ -5,6 +5,7 @@ import {
   Check,
   Copy,
   Github,
+  Languages,
   Leaf,
   Moon,
   Package,
@@ -40,13 +41,14 @@ import {
 } from "./index";
 
 type Page = "home" | "components" | "patterns" | "tokens" | "install";
+type Lang = "en" | "ko";
 
-const pages: Array<{ label: string; value: Page }> = [
-  { label: "Home", value: "home" },
-  { label: "Components", value: "components" },
-  { label: "Patterns", value: "patterns" },
-  { label: "Tokens", value: "tokens" },
-  { label: "Install", value: "install" },
+const pages: Array<{ value: Page }> = [
+  { value: "home" },
+  { value: "components" },
+  { value: "patterns" },
+  { value: "tokens" },
+  { value: "install" },
 ];
 
 type ComponentTone = "moss" | "sky" | "amber" | "plum";
@@ -287,8 +289,400 @@ const tokens = [
   ["Ink", "var(--ms-color-ink-800)"],
 ];
 
+const copy = {
+  en: {
+    nav: {
+      home: "Home",
+      components: "Components",
+      patterns: "Patterns",
+      tokens: "Tokens",
+      install: "Install",
+    },
+    chrome: {
+      primaryNavigation: "Primary navigation",
+      light: "Light",
+      dark: "Dark",
+      useLight: "Use light theme",
+      useDark: "Use dark theme",
+      switchLanguage: "Switch language to Korean",
+      language: "KO",
+    },
+    home: {
+      eyebrow: "React UI primitives",
+      title: "Hand-painted fantasy anime interfaces for React.",
+      body:
+        "Mosslight UI is a compact component library for soft product surfaces: moss fields, pale sky, inked borders, luminous feedback, and calm scenes that feel closer to an illustrated journey log than a neutral UI kit.",
+      install: "npm install mosslight-ui",
+      explore: "Explore components",
+      stageLabel: "Mosslight illustrated interface preview",
+      panelBadge: "Journey panel",
+      panelTitle: "Field journal",
+      panelBody: "Compact controls with readable rhythm and soft feedback.",
+      readiness: "Readiness",
+      save: "Save",
+      tune: "Tune",
+      features: {
+        landing: {
+          title: "Public landing first",
+          body: "A product-style site, not Storybook as the face of the library.",
+        },
+        dark: {
+          title: "Dark mode built in",
+          body: "Theme tokens switch between parchment daylight and quiet night surfaces.",
+        },
+        catalog: {
+          title: "Component catalog",
+          body: "Dedicated pages show primitives, patterns, tokens, and install details.",
+        },
+      },
+    },
+    components: {
+      eyebrow: "Components",
+      title: "Browse each primitive one at a time.",
+      body: "Pick a component from the left panel, inspect its base example, then change props to see the output update.",
+      listLabel: "Component list",
+      catalog: "Catalog",
+      primitives: "primitives",
+      props: "Props playground",
+      propsBody: "Change one prop at a time and watch the preview update.",
+      preview: "Preview",
+      code: "Code",
+      featuresLabel: "features",
+      groups: {
+        Actions: "Actions",
+        Forms: "Forms",
+        Structure: "Structure",
+        Feedback: "Feedback",
+      },
+    },
+    componentMeta: {
+      button: {
+        summary: "Primary, secondary, ghost, danger variants with icon and size support.",
+        features: ["Variants", "Sizes", "Icons"],
+      },
+      badge: {
+        summary: "Compact status labels for categories, tags, and state hints.",
+        features: ["Tone variants", "Inline rhythm", "High-contrast border"],
+      },
+      tooltip: {
+        summary: "Small contextual notes for icon-only or compact controls.",
+        features: ["Hover content", "Keyboard focus", "Compact placement"],
+      },
+      toast: {
+        summary: "Non-blocking status feedback with title, body, and optional action.",
+        features: ["Tone variants", "Viewport wrapper", "Action slot"],
+      },
+      field: {
+        summary: "Text input with label, hint, error, disabled, and required states.",
+        features: ["Hint text", "Error state", "Required marker"],
+      },
+      select: {
+        summary: "Native select styling with the same form control system as Field.",
+        features: ["Options", "Hint text", "Error state"],
+      },
+      checkbox: {
+        summary: "Checkbox control with label and helper text for small decisions.",
+        features: ["Checked state", "Hint text", "Disabled state"],
+      },
+      switch: {
+        summary: "Binary setting control for preferences and feature toggles.",
+        features: ["On/off state", "Label support", "Keyboard input"],
+      },
+      "radio-group": {
+        summary: "Grouped single-choice selection with shared label and name.",
+        features: ["Default value", "Controlled value", "Grouped semantics"],
+      },
+      slider: {
+        summary: "Range input for numeric tuning with visible output text.",
+        features: ["Min/max", "Controlled value", "Output label"],
+      },
+      card: {
+        summary: "Framed content surface with accent color support.",
+        features: ["Accent variants", "Article semantics", "Stacked content"],
+      },
+      accordion: {
+        summary: "Collapsible disclosure sections with keyboard navigation.",
+        features: ["Default open item", "Collapsible mode", "Arrow key support"],
+      },
+      tabs: {
+        summary: "Tabbed sections for switching related panels in one surface.",
+        features: ["Automatic/manual activation", "Keyboard navigation", "Panel linkage"],
+      },
+      breadcrumb: {
+        summary: "Hierarchical path display for multi-level app screens.",
+        features: ["Current page", "Custom separator", "Link props"],
+      },
+      pagination: {
+        summary: "Page navigation control with previous, next, and numbered pages.",
+        features: ["Controlled page", "Disabled edges", "Page buttons"],
+      },
+      separator: {
+        summary: "Horizontal or vertical divider for dense tool surfaces.",
+        features: ["Orientation", "Decorative mode", "ARIA separator mode"],
+      },
+      alert: {
+        summary: "Persistent message block for warnings, success, and status context.",
+        features: ["Title", "Icon slot", "Tone variants"],
+      },
+      dialog: {
+        summary: "Modal surface with title, description, footer, and focus return behavior.",
+        features: ["Controlled open", "Footer actions", "Escape close"],
+      },
+      progress: {
+        summary: "Linear progress meter for loading, completion, and readiness states.",
+        features: ["Value/max", "Optional label", "ARIA progressbar"],
+      },
+      skeleton: {
+        summary: "Placeholder blocks for loading text and content regions.",
+        features: ["Text variant", "Block variant", "Reduced layout shift"],
+      },
+      spinner: {
+        summary: "Compact loading indicator with accessible label text.",
+        features: ["Sizes", "Accessible label", "Inline use"],
+      },
+      avatar: {
+        summary: "User image or initials for people, authors, and account surfaces.",
+        features: ["Image fallback", "Initials", "Sizes"],
+      },
+    },
+    patterns: {
+      eyebrow: "Patterns",
+      title: "Reusable compositions for settings, onboarding, and decision points.",
+      body: "These are the screens a library site needs before people decide whether to install it.",
+      settings: "Settings",
+      themeControls: "Theme controls",
+      reduceMotion: "Reduce motion",
+      contrast: "High contrast borders",
+      compactDensity: "Use compact density",
+      compactHint: "Useful for admin and dashboard surfaces.",
+      onboarding: "Onboarding",
+      routeSetup: "Route setup",
+      decision: "Decision",
+      checklist: "Release checklist",
+      ready: "Ready for app UI",
+      readyBody: "Best suited for dashboards, small tools, and narrative product surfaces.",
+      light: "Light",
+      dark: "Dark",
+      lightBody: "Parchment surfaces, moss actions, sky focus.",
+      darkBody: "Muted ink surfaces with luminous accent tokens.",
+    },
+    tokens: {
+      eyebrow: "Tokens",
+      title: "A stronger palette for hand-painted interface atmosphere.",
+      body: "Warm neutrals are now balanced with ink, moss, sky, plum, amber, and rose so the page feels less generic.",
+    },
+    install: {
+      eyebrow: "Install",
+      title: "Published on npm and ready to import.",
+      body: "The package ships JavaScript, CommonJS, TypeScript declarations, and a CSS entry for the token/component layer.",
+      npm: "npm package",
+      github: "GitHub repo",
+    },
+  },
+  ko: {
+    nav: {
+      home: "홈",
+      components: "컴포넌트",
+      patterns: "패턴",
+      tokens: "토큰",
+      install: "설치",
+    },
+    chrome: {
+      primaryNavigation: "주요 내비게이션",
+      light: "라이트",
+      dark: "다크",
+      useLight: "라이트 테마 사용",
+      useDark: "다크 테마 사용",
+      switchLanguage: "영어로 언어 전환",
+      language: "EN",
+    },
+    home: {
+      eyebrow: "React UI primitives",
+      title: "손그림 판타지 애니메이션 무드의 React 인터페이스.",
+      body:
+        "Mosslight UI는 부드러운 제품 화면을 위한 작은 컴포넌트 라이브러리입니다. 이끼빛 필드, 옅은 하늘색, 잉크 테두리, 은은한 피드백, 조용한 장면감으로 평범한 UI 키트보다 여행 기록에 가까운 분위기를 만듭니다.",
+      install: "npm install mosslight-ui",
+      explore: "컴포넌트 보기",
+      stageLabel: "Mosslight 일러스트 인터페이스 미리보기",
+      panelBadge: "여정 패널",
+      panelTitle: "필드 저널",
+      panelBody: "읽기 쉬운 리듬과 부드러운 피드백을 가진 컴팩트 컨트롤.",
+      readiness: "준비도",
+      save: "저장",
+      tune: "조정",
+      features: {
+        landing: {
+          title: "공개 랜딩 우선",
+          body: "라이브러리의 첫인상을 Storybook이 아니라 제품형 소개 페이지로 보여줍니다.",
+        },
+        dark: {
+          title: "다크 모드 내장",
+          body: "토큰이 양피지 같은 밝은 화면과 조용한 밤 화면 사이를 전환합니다.",
+        },
+        catalog: {
+          title: "컴포넌트 카탈로그",
+          body: "프리미티브, 패턴, 토큰, 설치 정보를 별도 페이지에서 확인할 수 있습니다.",
+        },
+      },
+    },
+    components: {
+      eyebrow: "컴포넌트",
+      title: "프리미티브를 하나씩 살펴보세요.",
+      body: "왼쪽 패널에서 컴포넌트를 고르고, 기본 예시를 본 뒤 props를 바꿔 결과가 어떻게 달라지는지 확인합니다.",
+      listLabel: "컴포넌트 목록",
+      catalog: "카탈로그",
+      primitives: "개 프리미티브",
+      props: "Props 플레이그라운드",
+      propsBody: "prop을 하나씩 바꾸면 오른쪽 미리보기와 코드가 같이 갱신됩니다.",
+      preview: "미리보기",
+      code: "코드",
+      featuresLabel: "기능",
+      groups: {
+        Actions: "액션",
+        Forms: "폼",
+        Structure: "구조",
+        Feedback: "피드백",
+      },
+    },
+    componentMeta: {
+      button: {
+        summary: "primary, secondary, ghost, danger variant와 icon, size를 지원합니다.",
+        features: ["Variant", "Size", "Icon"],
+      },
+      badge: {
+        summary: "카테고리, 태그, 상태 힌트를 위한 작은 상태 라벨입니다.",
+        features: ["Tone variant", "인라인 리듬", "고대비 테두리"],
+      },
+      tooltip: {
+        summary: "아이콘 버튼이나 좁은 컨트롤에 붙이는 짧은 보조 설명입니다.",
+        features: ["Hover content", "키보드 포커스", "컴팩트 배치"],
+      },
+      toast: {
+        summary: "제목, 본문, 선택 액션을 가진 비차단 상태 피드백입니다.",
+        features: ["Tone variant", "Viewport wrapper", "Action slot"],
+      },
+      field: {
+        summary: "label, hint, error, disabled, required 상태를 가진 텍스트 입력입니다.",
+        features: ["Hint text", "Error state", "Required marker"],
+      },
+      select: {
+        summary: "Field와 같은 form control 시스템을 쓰는 native select 스타일입니다.",
+        features: ["Options", "Hint text", "Error state"],
+      },
+      checkbox: {
+        summary: "작은 선택을 위한 label과 helper text가 있는 checkbox입니다.",
+        features: ["Checked state", "Hint text", "Disabled state"],
+      },
+      switch: {
+        summary: "설정과 기능 토글에 쓰는 이진 상태 컨트롤입니다.",
+        features: ["On/off state", "Label support", "Keyboard input"],
+      },
+      "radio-group": {
+        summary: "공유 label과 name을 가진 단일 선택 그룹입니다.",
+        features: ["Default value", "Controlled value", "Grouped semantics"],
+      },
+      slider: {
+        summary: "숫자 값을 조정하고 output label을 보여주는 range input입니다.",
+        features: ["Min/max", "Controlled value", "Output label"],
+      },
+      card: {
+        summary: "accent color를 지원하는 프레임형 콘텐츠 surface입니다.",
+        features: ["Accent variant", "Article semantics", "Stacked content"],
+      },
+      accordion: {
+        summary: "키보드 내비게이션을 지원하는 접이식 disclosure section입니다.",
+        features: ["Default open item", "Collapsible mode", "Arrow key support"],
+      },
+      tabs: {
+        summary: "관련 패널을 한 surface 안에서 전환하는 tab 컴포넌트입니다.",
+        features: ["Activation mode", "Keyboard navigation", "Panel linkage"],
+      },
+      breadcrumb: {
+        summary: "여러 단계의 앱 화면 경로를 보여주는 계층형 경로 표시입니다.",
+        features: ["Current page", "Custom separator", "Link props"],
+      },
+      pagination: {
+        summary: "이전, 다음, 페이지 번호를 가진 페이지 내비게이션입니다.",
+        features: ["Controlled page", "Disabled edges", "Page buttons"],
+      },
+      separator: {
+        summary: "밀도 높은 툴 화면을 나누는 가로/세로 구분선입니다.",
+        features: ["Orientation", "Decorative mode", "ARIA separator mode"],
+      },
+      alert: {
+        summary: "경고, 성공, 상태 맥락을 오래 보여주는 메시지 블록입니다.",
+        features: ["Title", "Icon slot", "Tone variant"],
+      },
+      dialog: {
+        summary: "title, description, footer, focus return을 가진 modal surface입니다.",
+        features: ["Controlled open", "Footer actions", "Escape close"],
+      },
+      progress: {
+        summary: "loading, completion, readiness 상태를 보여주는 linear progress입니다.",
+        features: ["Value/max", "Optional label", "ARIA progressbar"],
+      },
+      skeleton: {
+        summary: "텍스트와 콘텐츠 영역 로딩 상태를 보여주는 placeholder입니다.",
+        features: ["Text variant", "Block variant", "Reduced layout shift"],
+      },
+      spinner: {
+        summary: "접근성 label을 가진 컴팩트 loading indicator입니다.",
+        features: ["Sizes", "Accessible label", "Inline use"],
+      },
+      avatar: {
+        summary: "사용자, 작성자, 계정 화면에 쓰는 이미지 또는 이니셜 표시입니다.",
+        features: ["Image fallback", "Initials", "Sizes"],
+      },
+    },
+    patterns: {
+      eyebrow: "패턴",
+      title: "설정, 온보딩, 의사결정 화면을 위한 재사용 조합.",
+      body: "설치 여부를 결정하기 전에 실제 화면 감각을 확인할 수 있는 조합 예시입니다.",
+      settings: "설정",
+      themeControls: "테마 컨트롤",
+      reduceMotion: "모션 줄이기",
+      contrast: "고대비 테두리",
+      compactDensity: "컴팩트 밀도 사용",
+      compactHint: "관리자 화면과 대시보드에 유용합니다.",
+      onboarding: "온보딩",
+      routeSetup: "경로 설정",
+      decision: "결정",
+      checklist: "릴리스 체크리스트",
+      ready: "앱 UI에 적합",
+      readyBody: "대시보드, 작은 도구, 서사적인 제품 화면에 잘 맞습니다.",
+      light: "라이트",
+      dark: "다크",
+      lightBody: "양피지 surface, 이끼빛 action, 하늘색 focus.",
+      darkBody: "먹빛 surface와 은은하게 빛나는 accent token.",
+    },
+    tokens: {
+      eyebrow: "토큰",
+      title: "손그림 인터페이스 분위기를 위한 더 강한 팔레트.",
+      body: "따뜻한 neutral에 ink, moss, sky, plum, amber, rose를 섞어 더 고유한 분위기를 만듭니다.",
+    },
+    install: {
+      eyebrow: "설치",
+      title: "npm에 배포되어 바로 import할 수 있습니다.",
+      body: "패키지는 JavaScript, CommonJS, TypeScript declaration, CSS entry를 함께 제공합니다.",
+      npm: "npm 패키지",
+      github: "GitHub 저장소",
+    },
+  },
+} as const;
+
+type Copy = (typeof copy)[Lang];
+
+function getInitialLang(): Lang {
+  const stored = window.localStorage.getItem("mosslight-lang");
+  if (stored === "en" || stored === "ko") return stored;
+
+  const browserLanguages = [...(navigator.languages ?? []), navigator.language].filter(Boolean);
+  return browserLanguages.some((language) => language.toLowerCase().startsWith("ko")) ? "ko" : "en";
+}
+
 function App() {
   const [page, setPage] = useState<Page>("home");
+  const [lang, setLang] = useState<Lang>(getInitialLang);
   const [dark, setDark] = useState(() => {
     const stored = window.localStorage.getItem("mosslight-theme");
     if (stored) return stored === "dark";
@@ -297,10 +691,16 @@ function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [paginationPage, setPaginationPage] = useState(2);
   const [glow, setGlow] = useState(68);
+  const t = copy[lang];
 
   useEffect(() => {
     window.localStorage.setItem("mosslight-theme", dark ? "dark" : "light");
   }, [dark]);
+
+  useEffect(() => {
+    window.localStorage.setItem("mosslight-lang", lang);
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   return (
     <main className="site-shell" data-ms-theme={dark ? "dark" : undefined}>
@@ -312,7 +712,7 @@ function App() {
           <span>Mosslight UI</span>
         </button>
 
-        <nav className="site-nav" aria-label="Primary navigation">
+        <nav className="site-nav" aria-label={t.chrome.primaryNavigation}>
           {pages.map((item) => (
             <button
               className="site-nav__item"
@@ -321,22 +721,33 @@ function App() {
               aria-current={page === item.value ? "page" : undefined}
               onClick={() => setPage(item.value)}
             >
-              {item.label}
+              {t.nav[item.value]}
             </button>
           ))}
         </nav>
 
-        <Button
-          variant="ghost"
-          icon={dark ? <Sun size={16} /> : <Moon size={16} />}
-          aria-label={dark ? "Use light theme" : "Use dark theme"}
-          onClick={() => setDark((value) => !value)}
-        >
-          {dark ? "Light" : "Dark"}
-        </Button>
+        <div className="site-actions">
+          <Button
+            variant="ghost"
+            icon={<Languages size={16} />}
+            aria-label={t.chrome.switchLanguage}
+            onClick={() => setLang((value) => (value === "en" ? "ko" : "en"))}
+          >
+            {t.chrome.language}
+          </Button>
+
+          <Button
+            variant="ghost"
+            icon={dark ? <Sun size={16} /> : <Moon size={16} />}
+            aria-label={dark ? t.chrome.useLight : t.chrome.useDark}
+            onClick={() => setDark((value) => !value)}
+          >
+            {dark ? t.chrome.light : t.chrome.dark}
+          </Button>
+        </div>
       </header>
 
-      {page === "home" ? <HomePage setPage={setPage} /> : null}
+      {page === "home" ? <HomePage setPage={setPage} t={t} /> : null}
       {page === "components" ? (
         <ComponentsPage
           dialogOpen={dialogOpen}
@@ -345,38 +756,35 @@ function App() {
           setDialogOpen={setDialogOpen}
           setGlow={setGlow}
           setPaginationPage={setPaginationPage}
+          t={t}
         />
       ) : null}
-      {page === "patterns" ? <PatternsPage /> : null}
-      {page === "tokens" ? <TokensPage /> : null}
-      {page === "install" ? <InstallPage /> : null}
+      {page === "patterns" ? <PatternsPage t={t} /> : null}
+      {page === "tokens" ? <TokensPage t={t} /> : null}
+      {page === "install" ? <InstallPage t={t} /> : null}
     </main>
   );
 }
 
-function HomePage({ setPage }: { setPage: (page: Page) => void }) {
+function HomePage({ setPage, t }: { setPage: (page: Page) => void; t: Copy }) {
   return (
     <>
       <section className="hero-section">
         <div className="hero-copy">
-          <Badge tone="moss">React UI primitives</Badge>
-          <h1>Hand-painted fantasy anime interfaces for React.</h1>
-          <p>
-            Mosslight UI is a compact component library for soft product surfaces:
-            moss fields, pale sky, inked borders, luminous feedback, and calm scenes
-            that feel closer to an illustrated journey log than a neutral UI kit.
-          </p>
+          <Badge tone="moss">{t.home.eyebrow}</Badge>
+          <h1>{t.home.title}</h1>
+          <p>{t.home.body}</p>
           <div className="hero-actions">
             <Button icon={<Package size={16} />} onClick={() => setPage("install")}>
-              npm install mosslight-ui
+              {t.home.install}
             </Button>
             <Button variant="secondary" icon={<Sparkles size={16} />} onClick={() => setPage("components")}>
-              Explore components
+              {t.home.explore}
             </Button>
           </div>
         </div>
 
-        <div className="anime-stage" aria-label="Mosslight illustrated interface preview">
+        <div className="anime-stage" aria-label={t.home.stageLabel}>
           <div className="anime-stage__wash" />
           <div className="anime-stage__cloud anime-stage__cloud--one" />
           <div className="anime-stage__cloud anime-stage__cloud--two" />
@@ -391,16 +799,16 @@ function HomePage({ setPage }: { setPage: (page: Page) => void }) {
               <span />
             </div>
             <div className="anime-window__body">
-              <Badge tone="amber">Journey panel</Badge>
-              <h2>Field journal</h2>
-              <p>Compact controls with readable rhythm and soft feedback.</p>
-              <Progress value={72} label="Readiness" />
+              <Badge tone="amber">{t.home.panelBadge}</Badge>
+              <h2>{t.home.panelTitle}</h2>
+              <p>{t.home.panelBody}</p>
+              <Progress value={72} label={t.home.readiness} />
               <div className="anime-window__actions">
                 <Button size="sm" icon={<Check size={14} />}>
-                  Save
+                  {t.home.save}
                 </Button>
                 <Button size="sm" variant="secondary" icon={<Wand2 size={14} />}>
-                  Tune
+                  {t.home.tune}
                 </Button>
               </div>
             </div>
@@ -409,14 +817,14 @@ function HomePage({ setPage }: { setPage: (page: Page) => void }) {
       </section>
 
       <section className="section-band feature-grid">
-        <FeatureCard title="Public landing first" icon={<Palette size={18} />}>
-          A product-style site, not Storybook as the face of the library.
+        <FeatureCard title={t.home.features.landing.title} icon={<Palette size={18} />}>
+          {t.home.features.landing.body}
         </FeatureCard>
-        <FeatureCard title="Dark mode built in" icon={<Moon size={18} />}>
-          Theme tokens switch between parchment daylight and quiet night surfaces.
+        <FeatureCard title={t.home.features.dark.title} icon={<Moon size={18} />}>
+          {t.home.features.dark.body}
         </FeatureCard>
-        <FeatureCard title="Component catalog" icon={<Package size={18} />}>
-          Dedicated pages show primitives, patterns, tokens, and install details.
+        <FeatureCard title={t.home.features.catalog.title} icon={<Package size={18} />}>
+          {t.home.features.catalog.body}
         </FeatureCard>
       </section>
     </>
@@ -430,6 +838,7 @@ function ComponentsPage({
   setDialogOpen,
   setGlow,
   setPaginationPage,
+  t,
 }: {
   dialogOpen: boolean;
   glow: number;
@@ -437,11 +846,13 @@ function ComponentsPage({
   setDialogOpen: (open: boolean) => void;
   setGlow: (value: number) => void;
   setPaginationPage: (page: number) => void;
+  t: Copy;
 }) {
   const [activeComponent, setActiveComponent] = useState(componentCatalog[0].id);
   const [playgroundProps, setPlaygroundProps] = useState<PlaygroundProps>(defaultPlaygroundProps);
   const selectedComponent =
     componentCatalog.find((component) => component.id === activeComponent) ?? componentCatalog[0];
+  const selectedCopy = t.componentMeta[selectedComponent.id as keyof Copy["componentMeta"]];
   const groups = Array.from(new Set(componentCatalog.map((component) => component.group)));
   const setPlaygroundProp = (name: string, value: PlaygroundValue) => {
     setPlaygroundProps((current) => ({ ...current, [name]: value }));
@@ -450,20 +861,23 @@ function ComponentsPage({
   return (
     <section className="page-shell">
       <PageHeading
-        eyebrow="Components"
-        title="Browse each primitive one at a time."
-        body="Pick a component from the left panel, inspect its base example, then change props to see the output update."
+        eyebrow={t.components.eyebrow}
+        title={t.components.title}
+        body={t.components.body}
       />
 
       <div className="component-browser">
-        <aside className="component-sidebar" aria-label="Component list">
+        <aside className="component-sidebar" aria-label={t.components.listLabel}>
           <div className="component-sidebar__intro">
-            <Badge tone="moss">Catalog</Badge>
-            <p>{componentCatalog.length} primitives</p>
+            <Badge tone="moss">{t.components.catalog}</Badge>
+            <p>
+              {componentCatalog.length}
+              {t.components.primitives.startsWith(" ") ? t.components.primitives : ` ${t.components.primitives}`}
+            </p>
           </div>
           {groups.map((group) => (
             <div className="component-menu-group" key={group}>
-              <h2>{group}</h2>
+              <h2>{t.components.groups[group]}</h2>
               <div className="component-menu">
                 {componentCatalog
                   .filter((component) => component.group === group)
@@ -476,7 +890,7 @@ function ComponentsPage({
                       onClick={() => setActiveComponent(component.id)}
                     >
                       <span>{component.label}</span>
-                      <small>{component.features[0]}</small>
+                      <small>{t.componentMeta[component.id as keyof Copy["componentMeta"]].features[0]}</small>
                     </button>
                   ))}
               </div>
@@ -488,9 +902,9 @@ function ComponentsPage({
           <Card accent={selectedComponent.tone} className="component-detail-card">
             <div className="component-detail__header">
               <div>
-                <Badge tone={selectedComponent.tone}>{selectedComponent.group}</Badge>
+                <Badge tone={selectedComponent.tone}>{t.components.groups[selectedComponent.group]}</Badge>
                 <h2>{selectedComponent.label}</h2>
-                <p>{selectedComponent.summary}</p>
+                <p>{selectedCopy.summary}</p>
               </div>
             </div>
 
@@ -505,8 +919,8 @@ function ComponentsPage({
               })}
             </div>
 
-            <div className="component-feature-list" aria-label={`${selectedComponent.label} features`}>
-              {selectedComponent.features.map((feature) => (
+            <div className="component-feature-list" aria-label={`${selectedComponent.label} ${t.components.featuresLabel}`}>
+              {selectedCopy.features.map((feature) => (
                 <span key={feature}>{feature}</span>
               ))}
             </div>
@@ -516,6 +930,7 @@ function ComponentsPage({
             component={selectedComponent}
             props={playgroundProps}
             setProp={setPlaygroundProp}
+            t={t}
           />
         </div>
       </div>
@@ -745,10 +1160,12 @@ function PropsPlayground({
   component,
   props,
   setProp,
+  t,
 }: {
   component: ComponentMeta;
   props: PlaygroundProps;
   setProp: (name: string, value: PlaygroundValue) => void;
+  t: Copy;
 }) {
   const [playgroundDialogOpen, setPlaygroundDialogOpen] = useState(false);
   const playground = getPlayground(component.id, props, setProp, playgroundDialogOpen, setPlaygroundDialogOpen);
@@ -765,20 +1182,20 @@ function PropsPlayground({
     <Card accent={component.tone} className="prop-playground-card">
       <div className="component-detail__header">
         <div>
-          <Badge tone={component.tone}>Props playground</Badge>
+          <Badge tone={component.tone}>{t.components.props}</Badge>
           <h2>{component.label} props</h2>
-          <p>Change one prop at a time and watch the preview update.</p>
+          <p>{t.components.propsBody}</p>
         </div>
       </div>
 
       <div className="prop-playground">
         <div className="prop-controls">{controls}</div>
         <div className="prop-preview">
-          <div className="prop-preview__label">Preview</div>
+          <div className="prop-preview__label">{t.components.preview}</div>
           <div className="prop-preview__stage">{playground.preview}</div>
         </div>
         <div className="prop-code">
-          <div className="prop-preview__label">Code</div>
+          <div className="prop-preview__label">{t.components.code}</div>
           <pre>
             <code>{code}</code>
           </pre>
@@ -1506,34 +1923,34 @@ function PropSlider({
   );
 }
 
-function PatternsPage() {
+function PatternsPage({ t }: { t: Copy }) {
   return (
     <section className="page-shell">
       <PageHeading
-        eyebrow="Patterns"
-        title="Reusable compositions for settings, onboarding, and decision points."
-        body="These are the screens a library site needs before people decide whether to install it."
+        eyebrow={t.patterns.eyebrow}
+        title={t.patterns.title}
+        body={t.patterns.body}
       />
 
       <div className="pattern-grid">
         <Card accent="moss">
-          <Badge tone="moss">Settings</Badge>
-          <h3>Theme controls</h3>
+          <Badge tone="moss">{t.patterns.settings}</Badge>
+          <h3>{t.patterns.themeControls}</h3>
           <div className="stack">
-            <Switch label="Reduce motion" />
-            <Switch label="High contrast borders" defaultChecked />
-            <Checkbox label="Use compact density" hint="Useful for admin and dashboard surfaces." />
+            <Switch label={t.patterns.reduceMotion} />
+            <Switch label={t.patterns.contrast} defaultChecked />
+            <Checkbox label={t.patterns.compactDensity} hint={t.patterns.compactHint} />
           </div>
         </Card>
 
         <Card accent="sky">
-          <Badge tone="sky">Onboarding</Badge>
-          <h3>Route setup</h3>
+          <Badge tone="sky">{t.patterns.onboarding}</Badge>
+          <h3>{t.patterns.routeSetup}</h3>
           <Breadcrumb
             items={[
               { label: "Mosslight", href: "#" },
-              { label: "Patterns", href: "#" },
-              { label: "Onboarding", current: true },
+              { label: t.patterns.eyebrow, href: "#" },
+              { label: t.patterns.onboarding, current: true },
             ]}
           />
           <Accordion
@@ -1546,15 +1963,15 @@ function PatternsPage() {
         </Card>
 
         <Card accent="amber">
-          <Badge tone="amber">Decision</Badge>
-          <h3>Release checklist</h3>
-          <Alert title="Ready for app UI" tone="amber">
-            Best suited for dashboards, small tools, and narrative product surfaces.
+          <Badge tone="amber">{t.patterns.decision}</Badge>
+          <h3>{t.patterns.checklist}</h3>
+          <Alert title={t.patterns.ready} tone="amber">
+            {t.patterns.readyBody}
           </Alert>
           <Tabs
             items={[
-              { label: "Light", value: "light", content: "Parchment surfaces, moss actions, sky focus." },
-              { label: "Dark", value: "dark", content: "Muted ink surfaces with luminous accent tokens." },
+              { label: t.patterns.light, value: "light", content: t.patterns.lightBody },
+              { label: t.patterns.dark, value: "dark", content: t.patterns.darkBody },
             ]}
           />
         </Card>
@@ -1563,13 +1980,13 @@ function PatternsPage() {
   );
 }
 
-function TokensPage() {
+function TokensPage({ t }: { t: Copy }) {
   return (
     <section className="page-shell">
       <PageHeading
-        eyebrow="Tokens"
-        title="A stronger palette for hand-painted interface atmosphere."
-        body="Warm neutrals are now balanced with ink, moss, sky, plum, amber, and rose so the page feels less generic."
+        eyebrow={t.tokens.eyebrow}
+        title={t.tokens.title}
+        body={t.tokens.body}
       />
       <div className="token-grid">
         {tokens.map(([name, color]) => (
@@ -1583,13 +2000,13 @@ function TokensPage() {
   );
 }
 
-function InstallPage() {
+function InstallPage({ t }: { t: Copy }) {
   return (
     <section className="page-shell install-page">
       <PageHeading
-        eyebrow="Install"
-        title="Published on npm and ready to import."
-        body="The package ships JavaScript, CommonJS, TypeScript declarations, and a CSS entry for the token/component layer."
+        eyebrow={t.install.eyebrow}
+        title={t.install.title}
+        body={t.install.body}
       />
       <div className="install-grid">
         <div className="code-panel">
@@ -1604,13 +2021,13 @@ function InstallPage() {
           <span className="ms-button__icon">
             <ArrowRight size={16} />
           </span>
-          <span className="ms-button__label">npm package</span>
+          <span className="ms-button__label">{t.install.npm}</span>
         </a>
         <a className="ms-button ms-button--ghost ms-button--md" href="https://github.com/sanghyun-io/mosslight-ui">
           <span className="ms-button__icon">
             <Github size={16} />
           </span>
-          <span className="ms-button__label">GitHub repo</span>
+          <span className="ms-button__label">{t.install.github}</span>
         </a>
       </div>
     </section>

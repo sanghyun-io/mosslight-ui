@@ -18,10 +18,40 @@ beforeEach(() => {
       dispatchEvent: vi.fn(),
     })),
   });
+  Object.defineProperty(navigator, "languages", {
+    configurable: true,
+    value: ["en-US"],
+  });
+  Object.defineProperty(navigator, "language", {
+    configurable: true,
+    value: "en-US",
+  });
   window.localStorage.clear();
 });
 
 describe("component props playground", () => {
+  it("uses the browser language initially and toggles languages from the header", async () => {
+    Object.defineProperty(navigator, "languages", {
+      configurable: true,
+      value: ["ko-KR", "en-US"],
+    });
+    Object.defineProperty(navigator, "language", {
+      configurable: true,
+      value: "ko-KR",
+    });
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "손그림 판타지 애니메이션 무드의 React 인터페이스." })).toBeInTheDocument();
+    expect(document.documentElement.lang).toBe("ko");
+
+    await user.click(screen.getByRole("button", { name: "영어로 언어 전환" }));
+
+    expect(screen.getByRole("heading", { name: "Hand-painted fantasy anime interfaces for React." })).toBeInTheDocument();
+    expect(document.documentElement.lang).toBe("en");
+  });
+
   it("syncs Button prop controls with preview and code", async () => {
     const user = userEvent.setup();
     render(<App />);

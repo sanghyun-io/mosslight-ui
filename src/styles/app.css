@@ -108,6 +108,14 @@
   color: var(--ms-text-primary);
 }
 
+.site-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ms-space-2);
+  justify-content: flex-end;
+}
+
 .hero-section,
 .page-shell,
 .section-band {
@@ -817,6 +825,10 @@
   }
 
   .site-nav {
+    justify-content: flex-start;
+  }
+
+  .site-actions {
     justify-content: flex-start;
   }
 
