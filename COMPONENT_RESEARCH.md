@@ -16,10 +16,10 @@ Mosslight UI now covers the practical starter surface expected from a small publ
 - Actions: `Button`
 - Status and feedback: `Alert`, `Badge`, `Progress`, `Spinner`, `Toast`
 - Containers and disclosure: `Accordion`, `Card`, `Dialog`, `Tabs`, `Tooltip`
-- Forms: `Checkbox`, `Field`, `RadioGroup`, `Select`, `Slider`, `Switch`
+- Forms: `Checkbox`, `Field`, `FormControl`, `RadioGroup`, `Select`, `Slider`, `Switch`
 - Navigation: `Breadcrumb`, `Pagination`
 - Data and layout helpers: `Avatar`, `Separator`, `Skeleton`
 
 ## Current Count
 
-Total exported components: 22.
+Total exported components: 23.
