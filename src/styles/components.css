@@ -54,8 +54,8 @@
 }
 
 .ms-button--primary {
-  background: var(--ms-color-moss-700);
-  color: var(--ms-color-paper);
+  background: var(--ms-accent-primary);
+  color: var(--ms-surface-panel);
 }
 
 .ms-button--secondary {
@@ -69,8 +69,8 @@
 }
 
 .ms-button--danger {
-  background: var(--ms-color-rose-500);
-  color: var(--ms-color-paper);
+  background: var(--ms-accent-danger);
+  color: var(--ms-surface-panel);
 }
 
 .ms-button__icon {

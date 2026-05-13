@@ -21,6 +21,18 @@
   --ms-color-amber-400: #e2b75e;
   --ms-color-amber-150: #faedc9;
   --ms-color-rose-500: #b06363;
+  --ms-color-rose-150: #f7dddd;
+
+  --ms-surface-page: var(--ms-color-parchment);
+  --ms-surface-panel: var(--ms-color-paper);
+  --ms-surface-muted: var(--ms-color-cream-100);
+  --ms-text-primary: var(--ms-color-ink-800);
+  --ms-text-muted: var(--ms-color-ink-600);
+  --ms-accent-primary: var(--ms-color-moss-700);
+  --ms-accent-primary-soft: var(--ms-color-moss-200);
+  --ms-accent-secondary: var(--ms-color-sky-400);
+  --ms-accent-warning: var(--ms-color-amber-400);
+  --ms-accent-danger: var(--ms-color-rose-500);
 
   --ms-space-1: 0.25rem;
   --ms-space-2: 0.5rem;
@@ -44,6 +56,46 @@
   --ms-motion-fast: 160ms ease;
 }
 
+[data-ms-theme="dark"] {
+  color-scheme: dark;
+  --ms-color-parchment: #1e2524;
+  --ms-color-paper: #26302d;
+  --ms-color-cream-100: #2f3933;
+  --ms-color-cream-200: #495546;
+  --ms-color-ink-800: #f5efd9;
+  --ms-color-ink-600: #c9c5b7;
+  --ms-color-moss-700: #b9d0a6;
+  --ms-color-moss-500: #8baa79;
+  --ms-color-moss-200: #3d5140;
+  --ms-color-sky-500: #b7d6df;
+  --ms-color-sky-400: #86b4c0;
+  --ms-color-sky-150: #30484e;
+  --ms-color-plum-500: #d0afcf;
+  --ms-color-plum-150: #4d3b4e;
+  --ms-color-amber-500: #f0c677;
+  --ms-color-amber-400: #d7a944;
+  --ms-color-amber-150: #514323;
+  --ms-color-rose-500: #e09292;
+  --ms-color-rose-150: #5c3535;
+  --ms-border-ink: 1px solid rgba(245, 239, 217, 0.18);
+  --ms-focus: 0 0 0 4px rgba(134, 180, 192, 0.42);
+}
+
+[data-ms-density="compact"] {
+  --ms-space-2: 0.375rem;
+  --ms-space-3: 0.625rem;
+  --ms-space-4: 0.75rem;
+  --ms-space-5: 1rem;
+  --ms-space-6: 1.25rem;
+}
+
+[data-ms-density="comfortable"] {
+  --ms-space-3: 0.875rem;
+  --ms-space-4: 1.125rem;
+  --ms-space-5: 1.5rem;
+  --ms-space-6: 1.75rem;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -52,11 +104,11 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  color: var(--ms-color-ink-800);
+  color: var(--ms-text-primary);
   font-family: var(--ms-font-sans);
   background:
     linear-gradient(120deg, rgba(228, 241, 242, 0.76), transparent 38%),
-    linear-gradient(180deg, var(--ms-color-paper), var(--ms-color-parchment));
+    linear-gradient(180deg, var(--ms-surface-panel), var(--ms-surface-page));
 }
 
 button,

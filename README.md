@@ -65,6 +65,18 @@ npm run storybook
 - `src/App.tsx`: live demo surface
 - `src/stories`: Storybook examples for the public component surface
 
+## Theming
+
+Mosslight UI supports semantic CSS tokens plus attribute-based theme overrides:
+
+```tsx
+<div data-ms-theme="dark" data-ms-density="compact">
+  <App />
+</div>
+```
+
+See [THEMING.md](./THEMING.md) for token names and density options.
+
 ## Components
 
 - `Accordion`
