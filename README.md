@@ -6,18 +6,10 @@ The style intentionally avoids copying a specific anime frame, character, logo, 
 
 ## Documentation
 
-- GitHub Pages: https://sanghyun-io.github.io/mosslight-ui/
-- Storybook locally: `npm run storybook`
+- Landing page: https://sanghyun-io.github.io/mosslight-ui/
+- Storybook is kept as an optional local component lab: `npm run storybook`
 
 ## Install
-
-Until the package is published to npm, install from GitHub:
-
-```bash
-npm install github:sanghyun-io/mosslight-ui
-```
-
-After npm publication:
 
 ```bash
 npm install mosslight-ui
@@ -57,15 +49,15 @@ npm run build
 npm run storybook
 ```
 
-Storybook includes component stories, accessibility checks through the a11y addon, and composed patterns such as settings panels, profile forms, and confirmation dialogs.
+Storybook is not the public documentation surface. It is only a local component lab for isolated states, accessibility checks, and composed patterns.
 
 ## Package Shape
 
 - `src/styles/tokens.css`: color, radius, typography, shadow, and motion tokens
 - `src/styles/components.css`: reusable component classes
 - `src/components`: React component primitives
-- `src/App.tsx`: live demo surface
-- `src/stories`: Storybook examples for the public component surface
+- `src/App.tsx`: landing page surface
+- `src/stories`: optional Storybook examples for local component review
 
 ## Theming
 
