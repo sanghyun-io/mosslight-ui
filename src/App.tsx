@@ -55,8 +55,6 @@ type TypingTrail = {
 type CursorTrail = { id: number; x: number; y: number; length: number; angle: number; tone: "sky" | "amber" | "plum" };
 type WarpPoint = { active: boolean; x: number; y: number };
 
-const nightHollowCaptureSize = 760;
-
 function markCaptureCloneSafe(documentClone: Document) {
   const style = documentClone.createElement("style");
   style.textContent = `
@@ -1111,14 +1109,10 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
 
     const documentWidth = Math.max(root.scrollWidth, document.documentElement.scrollWidth, window.innerWidth, 1);
     const documentHeight = Math.max(root.scrollHeight, document.documentElement.scrollHeight, window.innerHeight, 1);
-    const centerPageX = window.scrollX + warpPoint.x;
-    const centerPageY = window.scrollY + warpPoint.y;
-    const maxLeft = Math.max(0, documentWidth - nightHollowCaptureSize);
-    const maxTop = Math.max(0, documentHeight - nightHollowCaptureSize);
-    const left = clampNumber(centerPageX - nightHollowCaptureSize / 2, 0, maxLeft);
-    const top = clampNumber(centerPageY - nightHollowCaptureSize / 2, 0, maxTop);
-    const captureWidth = Math.min(nightHollowCaptureSize, documentWidth - left);
-    const captureHeight = Math.min(nightHollowCaptureSize, documentHeight - top);
+    const left = window.scrollX;
+    const top = window.scrollY;
+    const captureWidth = window.innerWidth;
+    const captureHeight = window.innerHeight;
 
     captureMetricsRef.current = {
       left,
@@ -1186,30 +1180,66 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
       const metrics = captureMetricsRef.current;
       const sourceScaleX = capture.width / Math.max(metrics.width, 1);
       const sourceScaleY = capture.height / Math.max(metrics.height, 1);
-      const swirl = seconds * (3.8 + charge * 2.8);
+
+      context.imageSmoothingEnabled = true;
+      context.globalCompositeOperation = "source-over";
+      context.globalAlpha = 1;
+      context.filter = "none";
+      context.drawImage(capture, 0, 0, capture.width, capture.height, 0, 0, width, height);
 
       context.save();
       context.beginPath();
       context.arc(x, y, radius, 0, Math.PI * 2);
       context.clip();
       context.globalCompositeOperation = "source-over";
-      context.imageSmoothingEnabled = true;
-      context.globalAlpha = 0.72;
+      context.clearRect(x - radius, y - radius, radius * 2, radius * 2);
 
-      const captureLeft = metrics.left - window.scrollX;
-      const captureTop = metrics.top - window.scrollY;
-      for (let step = 0; step < 9; step += 1) {
-        const progress = (step + 1) / 9;
-        const scale = 1 - progress * (0.46 + charge * 0.18);
-        const turn = progress * progress * (0.16 + charge * 0.12) * Math.sin(seconds * 1.4);
-        const destWidth = metrics.width * scale;
-        const destHeight = metrics.height * scale;
-        const destX = x - (x - captureLeft) * scale + Math.cos(turn) * progress * 7;
-        const destY = y - (y - captureTop) * scale + Math.sin(turn) * progress * 7;
+      const stripHeight = 4;
+      for (let offsetY = -radius; offsetY <= radius; offsetY += stripHeight) {
+        const halfWidth = Math.sqrt(Math.max(0, radius * radius - offsetY * offsetY));
+        if (halfWidth <= 0) continue;
+
+        const rowFalloff = 1 - Math.abs(offsetY) / radius;
+        const fold = rowFalloff * rowFalloff;
+        const wave = Math.sin(offsetY * 0.026 + seconds * 2.3) * fold;
+        const shear = wave * (32 + charge * 18);
+        const sourceHalfWidth = halfWidth * (1 + fold * (0.72 + charge * 0.38));
+        const destHalfWidth = Math.max(16, halfWidth * (1 - fold * (0.22 + charge * 0.12)));
+        const sourceY = clampNumber(y + offsetY * (1 + fold * 0.42) + wave * 16, 0, height - stripHeight);
+        const sourceX = clampNumber(x - sourceHalfWidth + shear * 0.35, 0, width - 1);
+        const sourceWidth = Math.min(sourceHalfWidth * 2, width - sourceX);
+        const destX = x - destHalfWidth + shear;
+        const destY = y + offsetY - fold * 8;
+        const destWidth = destHalfWidth * 2;
+        const destHeight = stripHeight + fold * 5;
+
+        context.globalAlpha = 0.96;
+        context.filter = `brightness(${1.02 + fold * 0.12}) contrast(${1 - fold * 0.18}) blur(${fold * 0.9}px)`;
+        context.drawImage(
+          capture,
+          sourceX * sourceScaleX,
+          sourceY * sourceScaleY,
+          sourceWidth * sourceScaleX,
+          (stripHeight + fold * 4) * sourceScaleY,
+          destX,
+          destY,
+          destWidth,
+          destHeight,
+        );
+      }
+
+      for (let pass = 0; pass < 6; pass += 1) {
+        const progress = (pass + 1) / 10;
+        const scale = 1 - progress * (0.42 + charge * 0.14);
+        const turn = progress * progress * (0.2 + charge * 0.08) * Math.sin(seconds * 1.5);
+        const destWidth = width * scale;
+        const destHeight = height * scale;
+        const destX = x - x * scale;
+        const destY = y - y * scale;
 
         context.save();
-        context.globalAlpha = 0.055 + progress * 0.025;
-        context.filter = `blur(${progress * 2.2}px)`;
+        context.globalAlpha = 0.025 + progress * 0.012;
+        context.filter = `blur(${progress * 2.8}px)`;
         context.translate(x, y);
         context.rotate(turn);
         context.translate(-x, -y);
@@ -1217,56 +1247,8 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
         context.restore();
       }
 
-      context.globalCompositeOperation = "source-over";
-      for (let index = 0; index < 132; index += 1) {
-        const ring = index % 44;
-        const lane = Math.floor(index / 44);
-        const sourceDistance = 64 + ring * 8.6 + lane * 22;
-        const fold = 1 - Math.min(sourceDistance / radius, 1);
-        if (fold <= 0) continue;
-
-        const sourceAngle = index * 2.399 + lane * 0.5 + seconds * (0.5 + charge * 0.22);
-        const targetAngle = sourceAngle - fold * (3.4 + charge * 1.8) - swirl * fold * 0.06;
-        const sourcePageX = clampNumber(
-          window.scrollX + x + Math.cos(sourceAngle) * sourceDistance,
-          metrics.left,
-          metrics.left + metrics.width - 1,
-        );
-        const sourcePageY = clampNumber(
-          window.scrollY + y + Math.sin(sourceAngle) * sourceDistance,
-          metrics.top,
-          metrics.top + metrics.height - 1,
-        );
-        const sx = (sourcePageX - metrics.left) * sourceScaleX;
-        const sy = (sourcePageY - metrics.top) * sourceScaleY;
-        const targetDistance = sourceDistance * (0.58 - fold * 0.48);
-        const tx = x + Math.cos(targetAngle) * targetDistance;
-        const ty = y + Math.sin(targetAngle) * targetDistance;
-        const sourceSize = (22 + fold * 46) * Math.max(sourceScaleX, sourceScaleY);
-        const targetWidth = 32 + fold * 96;
-        const targetHeight = 8 + fold * 22;
-
-        context.save();
-        context.globalAlpha = Math.min(0.42, 0.08 + fold * 0.28);
-        context.filter = `blur(${Math.max(0.4, fold * 2.6)}px)`;
-        context.translate(tx, ty);
-        context.rotate(targetAngle + Math.PI * 0.5);
-        context.drawImage(
-          capture,
-          sx - sourceSize / 2,
-          sy - sourceSize / 2,
-          sourceSize,
-          sourceSize,
-          -targetWidth / 2,
-          -targetHeight / 2,
-          targetWidth,
-          targetHeight,
-        );
-        context.restore();
-      }
       context.filter = "none";
       context.globalAlpha = 1;
-
       context.restore();
     };
 
