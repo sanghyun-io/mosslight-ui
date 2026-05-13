@@ -1,5 +1,5 @@
 import type { CSSProperties, FormEvent, PointerEvent, ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import {
   ArrowRight,
@@ -55,58 +55,7 @@ type TypingTrail = {
 type CursorTrail = { id: number; x: number; y: number; length: number; angle: number; tone: "sky" | "amber" | "plum" };
 type WarpPoint = { active: boolean; x: number; y: number };
 
-const warpAttractionSelector = [
-  ".site-header",
-  ".hero-copy",
-  ".hero-actions .ms-button",
-  ".anime-stage",
-  ".feature-grid > *",
-  ".showcase-grid > *",
-  ".component-sidebar",
-  ".component-menu__item",
-  ".component-detail-card",
-  ".prop-playground-card",
-  ".component-demo-surface",
-  ".prop-preview",
-  ".prop-code",
-  ".pattern-grid > *",
-  ".token-swatch",
-  ".install-grid > *",
-  ".code-panel",
-  ".ms-card",
-  ".ms-button",
-  ".ms-alert",
-  ".ms-toast",
-  ".ms-field",
-  ".ms-form-control",
-  ".ms-tabs",
-  ".ms-pagination",
-  ".ms-switch",
-  ".ms-checkbox",
-  ".ms-radio",
-  ".ms-slider",
-  ".ms-progress",
-  ".ms-avatar",
-  ".ms-badge",
-].join(",");
-
-const warpAttractionSkipSelector = [
-  ".night-hollow-canvas",
-  ".cursor-trail-layer",
-  ".spell-impact-layer",
-  ".typing-spell-layer",
-].join(",");
-
-function clearWarpTargetStyles(targets: HTMLElement[]) {
-  targets.forEach((target) => {
-    target.removeAttribute("data-warp-pulled");
-    target.style.removeProperty("--warp-pull-x");
-    target.style.removeProperty("--warp-pull-y");
-    target.style.removeProperty("--warp-pull-scale");
-    target.style.removeProperty("--warp-pull-blur");
-    target.style.removeProperty("--warp-pull-saturate");
-  });
-}
+const nightHollowCaptureSize = 760;
 
 function markCaptureCloneSafe(documentClone: Document) {
   const style = documentClone.createElement("style");
@@ -878,8 +827,6 @@ function App() {
   const [warpPoint, setWarpPoint] = useState<WarpPoint>({ active: false, x: 0, y: 0 });
   const lastCursorPoint = useRef<{ x: number; y: number; time: number } | null>(null);
   const previousCaretByField = useRef(new WeakMap<HTMLInputElement | HTMLTextAreaElement, number>());
-  const warpAttractionFrame = useRef<number | null>(null);
-  const warpAttractionTargets = useRef<HTMLElement[]>([]);
   const t = copy[lang];
 
   useEffect(() => {
@@ -905,89 +852,23 @@ function App() {
     }
   };
 
-  const clearWarpAttraction = useCallback(() => {
-    if (warpAttractionFrame.current !== null) {
-      window.cancelAnimationFrame(warpAttractionFrame.current);
-      warpAttractionFrame.current = null;
-    }
-    clearWarpTargetStyles(warpAttractionTargets.current);
-    warpAttractionTargets.current = [];
-  }, []);
-
-  const releaseWarp = useCallback(() => {
-    clearWarpAttraction();
+  const releaseWarp = () => {
     setWarpPoint((current) => ({ ...current, active: false }));
-  }, [clearWarpAttraction]);
-
-  const applyWarpAttraction = useCallback((x: number, y: number) => {
-    if (import.meta.env.MODE === "test" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    if (warpAttractionFrame.current !== null) {
-      window.cancelAnimationFrame(warpAttractionFrame.current);
-    }
-
-    warpAttractionFrame.current = window.requestAnimationFrame(() => {
-      warpAttractionFrame.current = null;
-      const root = document.querySelector(".site-shell");
-      if (!root) return;
-
-      clearWarpTargetStyles(warpAttractionTargets.current);
-
-      const candidates = Array.from(root.querySelectorAll<HTMLElement>(warpAttractionSelector));
-      const nextTargets: HTMLElement[] = [];
-      const seen = new Set<HTMLElement>();
-      const radius = 430;
-
-      candidates.forEach((target) => {
-        if (seen.has(target) || target.matches(warpAttractionSkipSelector) || target.closest(warpAttractionSkipSelector)) return;
-        seen.add(target);
-
-        const rect = target.getBoundingClientRect();
-        if (rect.width < 8 || rect.height < 8) return;
-
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const dx = x - centerX;
-        const dy = y - centerY;
-        const distance = Math.hypot(dx, dy);
-        if (distance > radius) return;
-
-        const falloff = 1 - distance / radius;
-        const pull = falloff * falloff * 74;
-        const unitX = dx / Math.max(distance, 1);
-        const unitY = dy / Math.max(distance, 1);
-
-        target.dataset.warpPulled = "true";
-        target.style.setProperty("--warp-pull-x", `${unitX * pull}px`);
-        target.style.setProperty("--warp-pull-y", `${unitY * pull}px`);
-        target.style.setProperty("--warp-pull-scale", `${1 - falloff * 0.045}`);
-        target.style.setProperty("--warp-pull-blur", `${falloff * 0.78}px`);
-        target.style.setProperty("--warp-pull-saturate", `${1 + falloff * 0.2}`);
-        nextTargets.push(target);
-      });
-
-      warpAttractionTargets.current = nextTargets;
-    });
-  }, []);
+  };
 
   useEffect(() => {
     if (!warpPoint.active) return;
 
+    const releaseActiveWarp = () => setWarpPoint((current) => ({ ...current, active: false }));
     window.addEventListener("pointerup", releaseWarp);
-    window.addEventListener("pointercancel", releaseWarp);
-    window.addEventListener("blur", releaseWarp);
+    window.addEventListener("pointercancel", releaseActiveWarp);
+    window.addEventListener("blur", releaseActiveWarp);
     return () => {
       window.removeEventListener("pointerup", releaseWarp);
-      window.removeEventListener("pointercancel", releaseWarp);
-      window.removeEventListener("blur", releaseWarp);
+      window.removeEventListener("pointercancel", releaseActiveWarp);
+      window.removeEventListener("blur", releaseActiveWarp);
     };
-  }, [releaseWarp, warpPoint.active]);
-
-  useEffect(() => {
-    clearWarpAttraction();
-  }, [clearWarpAttraction, page]);
-
-  useEffect(() => () => clearWarpAttraction(), [clearWarpAttraction]);
+  }, [warpPoint.active]);
 
   const castInteractionSpell = (event: PointerEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
@@ -1033,13 +914,11 @@ function App() {
     lastCursorPoint.current = { x: event.clientX, y: event.clientY, time: now };
     if (warpPoint.active) {
       setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
-      applyWarpAttraction(event.clientX, event.clientY);
     }
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
     setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
-    applyWarpAttraction(event.clientX, event.clientY);
     castInteractionSpell(event);
   };
 
@@ -1194,7 +1073,7 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const pointRef = useRef(warpPoint);
   const captureRef = useRef<HTMLCanvasElement | null>(null);
-  const captureMetricsRef = useRef({ scrollX: 0, scrollY: 0, width: 1, height: 1 });
+  const captureMetricsRef = useRef({ left: 0, top: 0, width: 1, height: 1 });
   const activeStartedRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -1208,17 +1087,34 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
     const root = document.querySelector(".site-shell") as HTMLElement | null;
     if (!root) return;
 
+    const documentWidth = Math.max(root.scrollWidth, document.documentElement.scrollWidth, window.innerWidth, 1);
+    const documentHeight = Math.max(root.scrollHeight, document.documentElement.scrollHeight, window.innerHeight, 1);
+    const centerPageX = window.scrollX + warpPoint.x;
+    const centerPageY = window.scrollY + warpPoint.y;
+    const maxLeft = Math.max(0, documentWidth - nightHollowCaptureSize);
+    const maxTop = Math.max(0, documentHeight - nightHollowCaptureSize);
+    const left = clampNumber(centerPageX - nightHollowCaptureSize / 2, 0, maxLeft);
+    const top = clampNumber(centerPageY - nightHollowCaptureSize / 2, 0, maxTop);
+    const captureWidth = Math.min(nightHollowCaptureSize, documentWidth - left);
+    const captureHeight = Math.min(nightHollowCaptureSize, documentHeight - top);
+
     captureMetricsRef.current = {
-      scrollX: window.scrollX,
-      scrollY: window.scrollY,
-      width: Math.max(root.scrollWidth, window.innerWidth, 1),
-      height: Math.max(root.scrollHeight, window.innerHeight, 1),
+      left,
+      top,
+      width: Math.max(captureWidth, 1),
+      height: Math.max(captureHeight, 1),
     };
 
     void html2canvas(root, {
       backgroundColor: null,
+      height: captureHeight,
       logging: false,
       scale: Math.min(window.devicePixelRatio || 1, 2),
+      width: captureWidth,
+      windowHeight: documentHeight,
+      windowWidth: documentWidth,
+      x: left,
+      y: top,
       ignoreElements: (element) =>
         element.classList.contains("night-hollow-canvas") ||
         element.classList.contains("cursor-trail-layer") ||
@@ -1288,8 +1184,8 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
       const metrics = captureMetricsRef.current;
       const sourceScaleX = capture.width / Math.max(metrics.width, 1);
       const sourceScaleY = capture.height / Math.max(metrics.height, 1);
-      const tile = charge > 0.7 ? 4 : 5;
-      const swirl = seconds * (2.8 + charge * 2.2);
+      const tile = charge > 0.7 ? 3.5 : 4.5;
+      const swirl = seconds * (3.8 + charge * 2.8);
 
       context.save();
       context.beginPath();
@@ -1306,30 +1202,48 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
           if (distance > radius) continue;
 
           const falloff = 1 - distance / radius;
-          const pull = falloff * falloff * (0.8 + charge * 0.9);
-          const arm = Math.sin(falloff * 17 + seconds * 6.8) * 0.16 * pull;
-          const angle = Math.atan2(dy, dx) + pull * 4.2 + swirl * pull * 0.28 + arm;
-          const sourceDistance = distance * (1 + pull * 2.35) + pull * 18;
-          const squeeze = 1 - falloff * 0.18;
+          const pull = falloff * falloff * (1.1 + charge * 1.05);
+          const crease = Math.sin(falloff * 22 + seconds * 8.2 + Math.atan2(dy, dx) * 3) * 0.22 * pull;
+          const angle = Math.atan2(dy, dx) + pull * 5.6 + swirl * pull * 0.36 + crease;
+          const sourceDistance = distance * (1 + pull * 3.15) + pull * 34;
+          const squeeze = 1 - falloff * (0.22 + charge * 0.12);
           const sourceViewportX = x + Math.cos(angle) * sourceDistance;
           const sourceViewportY = y + Math.sin(angle) * sourceDistance * squeeze;
-          const sx = (metrics.scrollX + sourceViewportX) * sourceScaleX;
-          const sy = (metrics.scrollY + sourceViewportY) * sourceScaleY;
+          const sourcePageX = clampNumber(window.scrollX + sourceViewportX, metrics.left, metrics.left + metrics.width - 1);
+          const sourcePageY = clampNumber(window.scrollY + sourceViewportY, metrics.top, metrics.top + metrics.height - 1);
+          const sx = (sourcePageX - metrics.left) * sourceScaleX;
+          const sy = (sourcePageY - metrics.top) * sourceScaleY;
           const sizeX = (tile + 2) * sourceScaleX;
           const sizeY = (tile + 2) * sourceScaleY;
-          const drawSize = tile + 2 + falloff * 1.6;
+          const drawSize = tile + 2.4 + falloff * 2.4;
 
           context.drawImage(capture, sx, sy, sizeX, sizeY, px - falloff, py - falloff, drawSize, drawSize);
-          if (pull > 0.22) {
+          if (pull > 0.18) {
             context.globalCompositeOperation = "screen";
-            context.globalAlpha = Math.min(0.22, pull * 0.16);
-            context.drawImage(capture, sx + pull * 5.2, sy, sizeX, sizeY, px - 1.2, py, drawSize, drawSize);
-            context.drawImage(capture, sx - pull * 5.2, sy, sizeX, sizeY, px + 1.2, py, drawSize, drawSize);
+            context.globalAlpha = Math.min(0.24, pull * 0.13);
+            context.drawImage(capture, sx + pull * 7.5, sy, sizeX, sizeY, px - 1.4, py, drawSize, drawSize);
+            context.drawImage(capture, sx - pull * 7.5, sy, sizeX, sizeY, px + 1.4, py, drawSize, drawSize);
             context.globalAlpha = 0.96;
             context.globalCompositeOperation = "source-over";
           }
         }
       }
+
+      context.globalCompositeOperation = "screen";
+      for (let index = 0; index < 54; index += 1) {
+        const lane = 38 + index * 5.2;
+        const spiral = index * 0.62 + seconds * (2.4 + charge * 1.6);
+        const fold = 1 - Math.min(lane / radius, 1);
+        const sx = (clampNumber(window.scrollX + x + Math.cos(spiral + fold * 4.8) * lane, metrics.left, metrics.left + metrics.width - 1) - metrics.left) * sourceScaleX;
+        const sy = (clampNumber(window.scrollY + y + Math.sin(spiral + fold * 4.8) * lane, metrics.top, metrics.top + metrics.height - 1) - metrics.top) * sourceScaleY;
+        const targetDistance = lane * (0.78 - fold * 0.34);
+        const tx = x + Math.cos(spiral - fold * 5.2) * targetDistance;
+        const ty = y + Math.sin(spiral - fold * 5.2) * targetDistance;
+        const size = 8 + fold * 14;
+        context.globalAlpha = fold * 0.14;
+        context.drawImage(capture, sx, sy, 12 * sourceScaleX, 12 * sourceScaleY, tx - size / 2, ty - size / 2, size, size);
+      }
+      context.globalAlpha = 1;
 
       context.globalCompositeOperation = "multiply";
       const compression = context.createRadialGradient(x, y, 0, x, y, radius);
