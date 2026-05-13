@@ -10,5 +10,6 @@ vite.lib.config.js
 vite.lib.config.d.ts
 
 vite-dev*.log
+vite-preview*.log
 storybook-dev*.log
 mosslight-*.png
