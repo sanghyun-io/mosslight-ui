@@ -8,4 +8,6 @@
 - Added accessibility improvements for dialog focus management, tab keyboard navigation, tooltip handler composition, and accordion keyboard navigation.
 - Added form state patterns for hints, errors, required fields, and custom form control composition.
 - Added semantic theme tokens, dark theme attributes, and density attributes.
+- Added Storybook accessibility checks through the a11y addon.
+- Added composed pattern stories for settings panels, profile forms, and confirmation dialogs.
 - Documented accessibility behavior and known limits.

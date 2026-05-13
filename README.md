@@ -57,6 +57,8 @@ npm run build
 npm run storybook
 ```
 
+Storybook includes component stories, accessibility checks through the a11y addon, and composed patterns such as settings panels, profile forms, and confirmation dialogs.
+
 ## Package Shape
 
 - `src/styles/tokens.css`: color, radius, typography, shadow, and motion tokens
