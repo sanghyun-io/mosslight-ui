@@ -45,17 +45,11 @@
   z-index: 1;
 }
 
-.night-hollow-canvas,
 .cursor-trail-layer {
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   position: fixed;
-}
-
-.night-hollow-canvas {
-  mix-blend-mode: normal;
-  z-index: 76;
 }
 
 .cursor-trail-layer {
@@ -1483,7 +1477,6 @@
     display: none;
   }
 
-  .night-hollow-canvas,
   .cursor-trail-layer {
     display: none;
   }

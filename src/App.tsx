@@ -1,6 +1,5 @@
 import type { CSSProperties, FormEvent, PointerEvent, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import html2canvas from "html2canvas";
 import {
   ArrowRight,
   Check,
@@ -53,74 +52,6 @@ type TypingTrail = {
   direction: "forward" | "backward";
 };
 type CursorTrail = { id: number; x: number; y: number; length: number; angle: number; tone: "sky" | "amber" | "plum" };
-type WarpPoint = { active: boolean; x: number; y: number };
-
-function markCaptureCloneSafe(documentClone: Document) {
-  const style = documentClone.createElement("style");
-  style.textContent = `
-    .site-shell,
-    .site-shell *,
-    .site-shell *::before,
-    .site-shell *::after {
-      accent-color: #6f8f6f !important;
-      background: transparent !important;
-      background-image: none !important;
-      background-color: transparent !important;
-      border-color: rgba(37, 49, 55, 0.22) !important;
-      box-shadow: none !important;
-      color: #253137 !important;
-      filter: none !important;
-      outline-color: rgba(37, 49, 55, 0.28) !important;
-      text-decoration-color: rgba(37, 49, 55, 0.28) !important;
-      text-shadow: none !important;
-    }
-
-    .site-shell *::before,
-    .site-shell *::after {
-      content: none !important;
-    }
-
-    .site-shell {
-      background: transparent !important;
-    }
-
-    .site-header,
-    .component-sidebar,
-    .component-detail-card,
-    .prop-playground-card,
-    .component-demo-surface,
-    .prop-preview,
-    .code-panel,
-    .ms-card,
-    .ms-alert,
-    .ms-toast,
-    .ms-field,
-    .ms-form-control {
-      background-color: rgba(255, 250, 240, 0.82) !important;
-    }
-
-    .ms-button,
-    .component-menu__item,
-    .token-swatch,
-    .ms-badge {
-      background-color: rgba(229, 219, 188, 0.82) !important;
-    }
-  `;
-  documentClone.head.appendChild(style);
-
-  const clonedShell = documentClone.querySelector(".site-shell") as HTMLElement | null;
-  if (!clonedShell) return;
-
-  clonedShell.querySelectorAll<HTMLElement>("*").forEach((element) => {
-    element.style.setProperty("background-image", "none", "important");
-    element.style.setProperty("box-shadow", "none", "important");
-    element.style.setProperty("filter", "none", "important");
-    element.style.setProperty("text-shadow", "none", "important");
-    element.style.setProperty("color", "#253137", "important");
-    element.style.setProperty("border-color", "rgba(37, 49, 55, 0.22)", "important");
-    element.style.setProperty("outline-color", "rgba(37, 49, 55, 0.28)", "important");
-  });
-}
 
 const pages: Array<{ value: Page }> = [
   { value: "home" },
@@ -847,7 +778,6 @@ function App() {
   const [spellImpacts, setSpellImpacts] = useState<SpellImpact[]>([]);
   const [typingTrails, setTypingTrails] = useState<TypingTrail[]>([]);
   const [cursorTrails, setCursorTrails] = useState<CursorTrail[]>([]);
-  const [warpPoint, setWarpPoint] = useState<WarpPoint>({ active: false, x: 0, y: 0 });
   const lastCursorPoint = useRef<{ x: number; y: number; time: number } | null>(null);
   const previousCaretByField = useRef(new WeakMap<HTMLInputElement | HTMLTextAreaElement, number>());
   const t = copy[lang];
@@ -874,24 +804,6 @@ function App() {
       window.history.pushState(null, "", nextPath);
     }
   };
-
-  const releaseWarp = () => {
-    setWarpPoint((current) => ({ ...current, active: false }));
-  };
-
-  useEffect(() => {
-    if (!warpPoint.active) return;
-
-    const releaseActiveWarp = () => setWarpPoint((current) => ({ ...current, active: false }));
-    window.addEventListener("pointerup", releaseWarp);
-    window.addEventListener("pointercancel", releaseActiveWarp);
-    window.addEventListener("blur", releaseActiveWarp);
-    return () => {
-      window.removeEventListener("pointerup", releaseWarp);
-      window.removeEventListener("pointercancel", releaseActiveWarp);
-      window.removeEventListener("blur", releaseActiveWarp);
-    };
-  }, [warpPoint.active]);
 
   const castInteractionSpell = (event: PointerEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
@@ -937,11 +849,6 @@ function App() {
     lastCursorPoint.current = { x: event.clientX, y: event.clientY, time: now };
   };
 
-  const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
-    setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
-    castInteractionSpell(event);
-  };
-
   const castTypingTrail = (event: FormEvent<HTMLElement>) => {
     if (!isTrailInput(event.target)) return;
     if (event.target.closest(".ms-field")) return;
@@ -974,15 +881,10 @@ function App() {
       className="site-shell"
       data-lang={lang}
       data-ms-theme={dark ? "dark" : undefined}
-      data-warping={warpPoint.active ? "true" : undefined}
       onInputCapture={castTypingTrail}
-      onPointerCancelCapture={releaseWarp}
-      onPointerDownCapture={handlePointerDown}
+      onPointerDownCapture={castInteractionSpell}
       onPointerMoveCapture={castCursorTrail}
-      onPointerUpCapture={releaseWarp}
     >
-      <NightHollowCanvas warpPoint={warpPoint} />
-
       <div className="cursor-trail-layer" aria-hidden="true">
         {cursorTrails.map((trail) => (
           <span
@@ -1087,204 +989,6 @@ function App() {
       {page === "install" ? <InstallPage t={t} /> : null}
     </main>
   );
-}
-
-function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const pointRef = useRef(warpPoint);
-  const captureRef = useRef<HTMLCanvasElement | null>(null);
-  const captureMetricsRef = useRef({ left: 0, top: 0, width: 1, height: 1 });
-  const activeStartedRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    pointRef.current = warpPoint;
-  }, [warpPoint]);
-
-  useEffect(() => {
-    if (import.meta.env.MODE === "test" || !warpPoint.active) return;
-
-    let cancelled = false;
-    const root = document.querySelector(".site-shell") as HTMLElement | null;
-    if (!root) return;
-
-    const documentWidth = Math.max(root.scrollWidth, document.documentElement.scrollWidth, window.innerWidth, 1);
-    const documentHeight = Math.max(root.scrollHeight, document.documentElement.scrollHeight, window.innerHeight, 1);
-    const left = window.scrollX;
-    const top = window.scrollY;
-    const captureWidth = window.innerWidth;
-    const captureHeight = window.innerHeight;
-
-    captureMetricsRef.current = {
-      left,
-      top,
-      width: Math.max(captureWidth, 1),
-      height: Math.max(captureHeight, 1),
-    };
-
-    void html2canvas(root, {
-      backgroundColor: null,
-      height: captureHeight,
-      logging: false,
-      scale: Math.min(window.devicePixelRatio || 1, 2),
-      width: captureWidth,
-      windowHeight: documentHeight,
-      windowWidth: documentWidth,
-      x: left,
-      y: top,
-      ignoreElements: (element) =>
-        element.classList.contains("night-hollow-canvas") ||
-        element.classList.contains("cursor-trail-layer") ||
-        element.classList.contains("spell-impact-layer") ||
-        element.classList.contains("typing-spell-layer"),
-      onclone: markCaptureCloneSafe,
-    }).then((capture) => {
-      if (!cancelled) captureRef.current = capture;
-    }).catch(() => {
-      if (!cancelled) captureRef.current = null;
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [warpPoint.active]);
-
-  useEffect(() => {
-    if (import.meta.env.MODE === "test") return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const context = canvas.getContext("2d", { alpha: true });
-    if (!context) return;
-
-    let animationFrame = 0;
-    let width = 0;
-    let height = 0;
-    let dpr = 1;
-
-    const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    const drawWarpedCapture = (x: number, y: number, radius: number, seconds: number, charge: number) => {
-      const capture = captureRef.current;
-      if (!capture) return;
-
-      const metrics = captureMetricsRef.current;
-      const sourceScaleX = capture.width / Math.max(metrics.width, 1);
-      const sourceScaleY = capture.height / Math.max(metrics.height, 1);
-
-      context.imageSmoothingEnabled = true;
-      context.globalCompositeOperation = "source-over";
-      context.globalAlpha = 1;
-      context.filter = "none";
-      context.drawImage(capture, 0, 0, capture.width, capture.height, 0, 0, width, height);
-
-      context.save();
-      context.beginPath();
-      context.arc(x, y, radius, 0, Math.PI * 2);
-      context.clip();
-      context.globalCompositeOperation = "source-over";
-      context.clearRect(x - radius, y - radius, radius * 2, radius * 2);
-
-      const stripHeight = 4;
-      for (let offsetY = -radius; offsetY <= radius; offsetY += stripHeight) {
-        const halfWidth = Math.sqrt(Math.max(0, radius * radius - offsetY * offsetY));
-        if (halfWidth <= 0) continue;
-
-        const rowFalloff = 1 - Math.abs(offsetY) / radius;
-        const fold = rowFalloff * rowFalloff;
-        const wave = Math.sin(offsetY * 0.026 + seconds * 2.3) * fold;
-        const shear = wave * (32 + charge * 18);
-        const sourceHalfWidth = halfWidth * (1 + fold * (0.72 + charge * 0.38));
-        const destHalfWidth = Math.max(16, halfWidth * (1 - fold * (0.22 + charge * 0.12)));
-        const sourceY = clampNumber(y + offsetY * (1 + fold * 0.42) + wave * 16, 0, height - stripHeight);
-        const sourceX = clampNumber(x - sourceHalfWidth + shear * 0.35, 0, width - 1);
-        const sourceWidth = Math.min(sourceHalfWidth * 2, width - sourceX);
-        const destX = x - destHalfWidth + shear;
-        const destY = y + offsetY - fold * 8;
-        const destWidth = destHalfWidth * 2;
-        const destHeight = stripHeight + fold * 5;
-
-        context.globalAlpha = 0.96;
-        context.filter = `brightness(${1.02 + fold * 0.12}) contrast(${1 - fold * 0.18}) blur(${fold * 0.9}px)`;
-        context.drawImage(
-          capture,
-          sourceX * sourceScaleX,
-          sourceY * sourceScaleY,
-          sourceWidth * sourceScaleX,
-          (stripHeight + fold * 4) * sourceScaleY,
-          destX,
-          destY,
-          destWidth,
-          destHeight,
-        );
-      }
-
-      for (let pass = 0; pass < 6; pass += 1) {
-        const progress = (pass + 1) / 10;
-        const scale = 1 - progress * (0.42 + charge * 0.14);
-        const turn = progress * progress * (0.2 + charge * 0.08) * Math.sin(seconds * 1.5);
-        const destWidth = width * scale;
-        const destHeight = height * scale;
-        const destX = x - x * scale;
-        const destY = y - y * scale;
-
-        context.save();
-        context.globalAlpha = 0.025 + progress * 0.012;
-        context.filter = `blur(${progress * 2.8}px)`;
-        context.translate(x, y);
-        context.rotate(turn);
-        context.translate(-x, -y);
-        context.drawImage(capture, 0, 0, capture.width, capture.height, destX, destY, destWidth, destHeight);
-        context.restore();
-      }
-
-      context.filter = "none";
-      context.globalAlpha = 1;
-      context.restore();
-    };
-
-    const render = (time: number) => {
-      context.clearRect(0, 0, width, height);
-      const point = pointRef.current;
-
-      if (point.active) {
-        const x = point.x;
-        const y = point.y;
-        const seconds = time / 1000;
-        if (activeStartedRef.current === null) activeStartedRef.current = seconds;
-        const activeFor = Math.min(1, Math.max(0, seconds - activeStartedRef.current));
-        const pulse = Math.sin(seconds * 7.4) * 0.5 + 0.5;
-        const charge = Math.min(1, 0.3 + activeFor * 1.2);
-        const radius = 290 + charge * 132 + pulse * 18;
-
-        drawWarpedCapture(x, y, radius, seconds, charge);
-      } else {
-        activeStartedRef.current = null;
-      }
-
-      animationFrame = window.requestAnimationFrame(render);
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-    animationFrame = window.requestAnimationFrame(render);
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      window.cancelAnimationFrame(animationFrame);
-    };
-  }, []);
-
-  return <canvas className="night-hollow-canvas" ref={canvasRef} aria-hidden="true" />;
 }
 
 function HomePage({ setPage, t }: { setPage: (page: Page) => void; t: Copy }) {
