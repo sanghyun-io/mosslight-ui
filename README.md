@@ -77,6 +77,10 @@ Mosslight UI supports semantic CSS tokens plus attribute-based theme overrides:
 
 See [THEMING.md](./THEMING.md) for token names and density options.
 
+## Accessibility
+
+See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for implemented keyboard and ARIA behavior.
+
 ## Components
 
 - `Accordion`
