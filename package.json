@@ -12,6 +12,9 @@
   "bugs": {
     "url": "https://github.com/sanghyun-io/mosslight-ui/issues"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "engines": {
     "node": ">=20.19"
   },
