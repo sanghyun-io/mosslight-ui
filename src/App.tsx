@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
@@ -42,6 +42,7 @@ import {
 
 type Page = "home" | "components" | "patterns" | "tokens" | "install";
 type Lang = "en" | "ko";
+type SpellImpact = { id: number; x: number; y: number };
 
 const pages: Array<{ value: Page }> = [
   { value: "home" },
@@ -691,6 +692,7 @@ function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [paginationPage, setPaginationPage] = useState(2);
   const [glow, setGlow] = useState(68);
+  const [spellImpacts, setSpellImpacts] = useState<SpellImpact[]>([]);
   const t = copy[lang];
 
   useEffect(() => {
@@ -702,8 +704,35 @@ function App() {
     document.documentElement.lang = lang;
   }, [lang]);
 
+  const castInteractionSpell = (event: PointerEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    const interactive = target.closest("button, a, input, select, textarea, label, [role='tab'], [role='button']");
+    if (!interactive) return;
+
+    const id = window.performance.now();
+    setSpellImpacts((current) => [...current.slice(-5), { id, x: event.clientX, y: event.clientY }]);
+    window.setTimeout(() => {
+      setSpellImpacts((current) => current.filter((impact) => impact.id !== id));
+    }, 820);
+  };
+
   return (
-    <main className="site-shell" data-lang={lang} data-ms-theme={dark ? "dark" : undefined}>
+    <main
+      className="site-shell"
+      data-lang={lang}
+      data-ms-theme={dark ? "dark" : undefined}
+      onPointerDownCapture={castInteractionSpell}
+    >
+      <div className="spell-impact-layer" aria-hidden="true">
+        {spellImpacts.map((impact) => (
+          <span
+            className="spell-impact"
+            key={impact.id}
+            style={{ "--impact-x": `${impact.x}px`, "--impact-y": `${impact.y}px` } as CSSProperties}
+          />
+        ))}
+      </div>
+
       <header className="site-header">
         <button className="site-brand" type="button" onClick={() => setPage("home")}>
           <span className="site-brand__mark" aria-hidden="true">
