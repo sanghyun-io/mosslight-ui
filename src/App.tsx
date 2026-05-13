@@ -360,11 +360,11 @@ function HomePage({ setPage }: { setPage: (page: Page) => void }) {
       <section className="hero-section">
         <div className="hero-copy">
           <Badge tone="moss">React UI primitives</Badge>
-          <h1>Quiet fantasy interfaces with a hand-painted anime mood.</h1>
+          <h1>Hand-painted fantasy anime interfaces for React.</h1>
           <p>
             Mosslight UI is a compact component library for soft product surfaces:
-            moss fields, pale sky, inked borders, luminous feedback, and calm
-            interaction states without copying a specific character or frame.
+            moss fields, pale sky, inked borders, luminous feedback, and calm scenes
+            that feel closer to an illustrated journey log than a neutral UI kit.
           </p>
           <div className="hero-actions">
             <Button icon={<Package size={16} />} onClick={() => setPage("install")}>
