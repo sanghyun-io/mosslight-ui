@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
 beforeEach(() => {
+  window.history.replaceState(null, "", "/mosslight-ui/");
   Object.defineProperty(window, "matchMedia", {
     configurable: true,
     writable: true,
@@ -30,6 +31,23 @@ beforeEach(() => {
 });
 
 describe("component props playground", () => {
+  it("syncs page navigation with browser paths and supports direct entry", async () => {
+    window.history.replaceState(null, "", "/mosslight-ui/components");
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Browse each primitive one at a time." })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Tokens" }));
+    expect(window.location.pathname).toBe("/mosslight-ui/tokens");
+    expect(screen.getByRole("heading", { name: "A stronger palette for hand-painted interface atmosphere." })).toBeInTheDocument();
+
+    window.history.pushState(null, "", "/mosslight-ui/install");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    expect(await screen.findByRole("heading", { name: "Published on npm and ready to import." })).toBeInTheDocument();
+  });
+
   it("uses the browser language initially and toggles languages from the header", async () => {
     Object.defineProperty(navigator, "languages", {
       configurable: true,

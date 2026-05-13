@@ -51,6 +51,8 @@ type TypingTrail = {
   tone: "bolt" | "ember" | "frost";
   direction: "forward" | "backward";
 };
+type CursorTrail = { id: number; x: number; y: number; length: number; angle: number; tone: "sky" | "amber" | "plum" };
+type WarpPoint = { active: boolean; x: number; y: number };
 
 const pages: Array<{ value: Page }> = [
   { value: "home" },
@@ -59,6 +61,44 @@ const pages: Array<{ value: Page }> = [
   { value: "tokens" },
   { value: "install" },
 ];
+
+const routeSegments: Record<Page, string> = {
+  home: "",
+  components: "components",
+  patterns: "patterns",
+  tokens: "tokens",
+  install: "install",
+};
+
+const pageBySegment = Object.entries(routeSegments).reduce<Record<string, Page>>((routeMap, [page, segment]) => {
+  routeMap[segment] = page as Page;
+  return routeMap;
+}, {});
+
+function getSiteBase() {
+  const configuredBase = import.meta.env.BASE_URL.replace(/\/$/, "");
+  if (configuredBase) return configuredBase;
+  if (window.location.pathname === "/mosslight-ui" || window.location.pathname.startsWith("/mosslight-ui/")) {
+    return "/mosslight-ui";
+  }
+
+  return "";
+}
+
+function getPagePath(page: Page) {
+  const base = getSiteBase();
+  const segment = routeSegments[page];
+  return `${base}/${segment}`.replace(/\/$/, "") || "/";
+}
+
+function getPageFromPath(pathname: string): Page {
+  const base = getSiteBase();
+  const withoutBase = base && pathname.startsWith(`${base}/`) ? pathname.slice(base.length + 1) : pathname.replace(/^\//, "");
+  const segments = withoutBase.split("/");
+  const segment = segments[0] ?? "";
+
+  return pageBySegment[segment] ?? pageBySegment[segments[1] ?? ""] ?? "home";
+}
 
 type ComponentTone = "moss" | "sky" | "amber" | "plum";
 
@@ -726,7 +766,7 @@ function getInputCaretViewportX(field: HTMLInputElement | HTMLTextAreaElement, c
 }
 
 function App() {
-  const [page, setPage] = useState<Page>("home");
+  const [page, setPage] = useState<Page>(() => getPageFromPath(window.location.pathname));
   const [lang, setLang] = useState<Lang>(getInitialLang);
   const [dark, setDark] = useState(() => {
     const stored = window.localStorage.getItem("mosslight-theme");
@@ -738,6 +778,9 @@ function App() {
   const [glow, setGlow] = useState(68);
   const [spellImpacts, setSpellImpacts] = useState<SpellImpact[]>([]);
   const [typingTrails, setTypingTrails] = useState<TypingTrail[]>([]);
+  const [cursorTrails, setCursorTrails] = useState<CursorTrail[]>([]);
+  const [warpPoint, setWarpPoint] = useState<WarpPoint>({ active: false, x: 0, y: 0 });
+  const lastCursorPoint = useRef<{ x: number; y: number; time: number } | null>(null);
   const previousCaretByField = useRef(new WeakMap<HTMLInputElement | HTMLTextAreaElement, number>());
   const t = copy[lang];
 
@@ -750,6 +793,34 @@ function App() {
     document.documentElement.lang = lang;
   }, [lang]);
 
+  useEffect(() => {
+    const handlePopState = () => setPage(getPageFromPath(window.location.pathname));
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const navigateToPage = (nextPage: Page) => {
+    setPage(nextPage);
+    const nextPath = getPagePath(nextPage);
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState(null, "", nextPath);
+    }
+  };
+
+  useEffect(() => {
+    if (!warpPoint.active) return;
+
+    const releaseWarp = () => setWarpPoint((current) => ({ ...current, active: false }));
+    window.addEventListener("pointerup", releaseWarp);
+    window.addEventListener("pointercancel", releaseWarp);
+    window.addEventListener("blur", releaseWarp);
+    return () => {
+      window.removeEventListener("pointerup", releaseWarp);
+      window.removeEventListener("pointercancel", releaseWarp);
+      window.removeEventListener("blur", releaseWarp);
+    };
+  }, [warpPoint.active]);
+
   const castInteractionSpell = (event: PointerEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
     const interactive = target.closest("button, a, input, select, textarea, label, [role='tab'], [role='button']");
@@ -760,6 +831,44 @@ function App() {
     window.setTimeout(() => {
       setSpellImpacts((current) => current.filter((impact) => impact.id !== id));
     }, 820);
+  };
+
+  const castCursorTrail = (event: PointerEvent<HTMLElement>) => {
+    const now = window.performance.now();
+    const previous = lastCursorPoint.current;
+    if (!previous) {
+      lastCursorPoint.current = { x: event.clientX, y: event.clientY, time: now };
+      return;
+    }
+
+    const dx = event.clientX - previous.x;
+    const dy = event.clientY - previous.y;
+    const distance = Math.hypot(dx, dy);
+    if (distance < 9 || now - previous.time < 24) return;
+
+    const id = now;
+    const tones: CursorTrail["tone"][] = ["sky", "amber", "plum"];
+    setCursorTrails((current) => [
+      ...current.slice(-14),
+      {
+        id,
+        x: event.clientX,
+        y: event.clientY,
+        length: Math.min(92, Math.max(28, distance * 2.4)),
+        angle: (Math.atan2(dy, dx) * 180) / Math.PI,
+        tone: tones[Math.floor(id) % tones.length],
+      },
+    ]);
+    window.setTimeout(() => {
+      setCursorTrails((current) => current.filter((trail) => trail.id !== id));
+    }, 520);
+    lastCursorPoint.current = { x: event.clientX, y: event.clientY, time: now };
+    if (warpPoint.active) setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
+  };
+
+  const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
+    setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
+    castInteractionSpell(event);
   };
 
   const castTypingTrail = (event: FormEvent<HTMLElement>) => {
@@ -795,8 +904,35 @@ function App() {
       data-lang={lang}
       data-ms-theme={dark ? "dark" : undefined}
       onInputCapture={castTypingTrail}
-      onPointerDownCapture={castInteractionSpell}
+      onPointerCancelCapture={() => setWarpPoint((current) => ({ ...current, active: false }))}
+      onPointerDownCapture={handlePointerDown}
+      onPointerMoveCapture={castCursorTrail}
+      onPointerUpCapture={() => setWarpPoint((current) => ({ ...current, active: false }))}
     >
+      <div
+        className="blackhole-warp"
+        aria-hidden="true"
+        data-active={warpPoint.active ? "true" : undefined}
+        style={{ "--warp-x": `${warpPoint.x}px`, "--warp-y": `${warpPoint.y}px` } as CSSProperties}
+      />
+
+      <div className="cursor-trail-layer" aria-hidden="true">
+        {cursorTrails.map((trail) => (
+          <span
+            className={`cursor-trail cursor-trail--${trail.tone}`}
+            key={trail.id}
+            style={
+              {
+                "--cursor-x": `${trail.x}px`,
+                "--cursor-y": `${trail.y}px`,
+                "--cursor-length": `${trail.length}px`,
+                "--cursor-angle": `${trail.angle}deg`,
+              } as CSSProperties
+            }
+          />
+        ))}
+      </div>
+
       <div className="spell-impact-layer" aria-hidden="true">
         {spellImpacts.map((impact) => (
           <span
@@ -825,7 +961,7 @@ function App() {
       </div>
 
       <header className="site-header">
-        <button className="site-brand" type="button" onClick={() => setPage("home")}>
+        <button className="site-brand" type="button" onClick={() => navigateToPage("home")}>
           <span className="site-brand__mark" aria-hidden="true">
             <Leaf size={18} />
           </span>
@@ -839,7 +975,7 @@ function App() {
               type="button"
               key={item.value}
               aria-current={page === item.value ? "page" : undefined}
-              onClick={() => setPage(item.value)}
+              onClick={() => navigateToPage(item.value)}
             >
               {t.nav[item.value]}
             </button>
@@ -867,7 +1003,7 @@ function App() {
         </div>
       </header>
 
-      {page === "home" ? <HomePage setPage={setPage} t={t} /> : null}
+      {page === "home" ? <HomePage setPage={navigateToPage} t={t} /> : null}
       {page === "components" ? (
         <ComponentsPage
           dialogOpen={dialogOpen}
