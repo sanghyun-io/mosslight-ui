@@ -10,8 +10,22 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const DarkCompact: Story = {
+  parameters: { layout: "fullscreen" },
   render: () => (
-    <div data-ms-theme="dark" data-ms-density="compact" style={{ padding: "1.25rem", background: "var(--ms-surface-page)" }}>
+    <div
+      className="ms-theme-dark ms-density-compact"
+      data-ms-theme="dark"
+      data-ms-density="compact"
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1.25rem",
+        background: "var(--ms-surface-page)",
+        color: "var(--ms-text-primary)",
+      }}
+    >
       <Card accent="sky" style={{ minWidth: "22rem" }}>
         <Alert title="Night route" tone="sky">
           Semantic tokens keep the same component API across themes.

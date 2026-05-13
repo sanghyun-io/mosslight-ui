@@ -75,6 +75,8 @@ Mosslight UI supports semantic CSS tokens plus attribute-based theme overrides:
 </div>
 ```
 
+Equivalent class helpers are available as `ms-theme-dark`, `ms-density-compact`, and `ms-density-comfortable`.
+
 See [THEMING.md](./THEMING.md) for token names and density options.
 
 ## Accessibility

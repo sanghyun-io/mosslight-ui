@@ -23,6 +23,14 @@ Mosslight UI exposes raw palette tokens and semantic tokens. Prefer semantic tok
 </div>
 ```
 
+Equivalent class helpers are also available:
+
+```html
+<div class="ms-theme-dark ms-density-compact">
+  ...
+</div>
+```
+
 ```html
 <div data-ms-density="compact">
   ...
