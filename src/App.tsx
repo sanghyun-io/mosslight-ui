@@ -1495,6 +1495,7 @@ function PropSlider({
 }) {
   return (
     <Slider
+      id={`prop-${name}`}
       label={label}
       min={min}
       max={max}
