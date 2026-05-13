@@ -1,5 +1,6 @@
 import type { CSSProperties, FormEvent, PointerEvent, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
+import html2canvas from "html2canvas";
 import {
   ArrowRight,
   Check,
@@ -1021,10 +1022,36 @@ function App() {
 function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const pointRef = useRef(warpPoint);
+  const captureRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     pointRef.current = warpPoint;
   }, [warpPoint]);
+
+  useEffect(() => {
+    if (import.meta.env.MODE === "test" || !warpPoint.active) return;
+
+    let cancelled = false;
+    const root = document.querySelector(".site-shell") as HTMLElement | null;
+    if (!root) return;
+
+    void html2canvas(root, {
+      backgroundColor: null,
+      logging: false,
+      scale: Math.min(window.devicePixelRatio || 1, 2),
+      ignoreElements: (element) =>
+        element.classList.contains("night-hollow-canvas") ||
+        element.classList.contains("cursor-trail-layer") ||
+        element.classList.contains("spell-impact-layer") ||
+        element.classList.contains("typing-spell-layer"),
+    }).then((capture) => {
+      if (!cancelled) captureRef.current = capture;
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [warpPoint.active]);
 
   useEffect(() => {
     if (import.meta.env.MODE === "test") return;
@@ -1071,6 +1098,52 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
       context.stroke();
     };
 
+    const drawWarpedCapture = (x: number, y: number, radius: number, seconds: number) => {
+      const capture = captureRef.current;
+      if (!capture) return;
+
+      const sourceScale = capture.width / Math.max(width, 1);
+      const tile = 7;
+      const swirl = seconds * 1.18;
+
+      context.save();
+      context.beginPath();
+      context.arc(x, y, radius, 0, Math.PI * 2);
+      context.clip();
+      context.globalAlpha = 0.88;
+      context.globalCompositeOperation = "source-over";
+
+      for (let dy = -radius; dy <= radius; dy += tile) {
+        for (let dx = -radius; dx <= radius; dx += tile) {
+          const px = x + dx;
+          const py = y + dy;
+          const distance = Math.hypot(dx, dy);
+          if (distance > radius) continue;
+
+          const falloff = 1 - distance / radius;
+          const pull = falloff * falloff;
+          const angle = Math.atan2(dy, dx) + pull * 1.15 + swirl * pull * 0.22;
+          const sourceDistance = distance * (1 + pull * 0.7);
+          const chroma = pull * 2.8;
+          const sx = (x + Math.cos(angle) * sourceDistance) * sourceScale;
+          const sy = (y + Math.sin(angle) * sourceDistance) * sourceScale;
+          const size = (tile + 1) * sourceScale;
+
+          context.drawImage(capture, sx, sy, size, size, px, py, tile + 1, tile + 1);
+          if (pull > 0.34) {
+            context.globalCompositeOperation = "screen";
+            context.globalAlpha = pull * 0.12;
+            context.drawImage(capture, sx + chroma, sy, size, size, px - 0.8, py, tile + 1, tile + 1);
+            context.drawImage(capture, sx - chroma, sy, size, size, px + 0.8, py, tile + 1, tile + 1);
+            context.globalAlpha = 0.88;
+            context.globalCompositeOperation = "source-over";
+          }
+        }
+      }
+
+      context.restore();
+    };
+
     const render = (time: number) => {
       context.clearRect(0, 0, width, height);
       const point = pointRef.current;
@@ -1081,6 +1154,8 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
         const seconds = time / 1000;
         const pulse = Math.sin(seconds * 7.4) * 0.5 + 0.5;
         const radius = 142 + pulse * 10;
+
+        drawWarpedCapture(x, y, radius * 0.86, seconds);
 
         context.globalCompositeOperation = "source-over";
         const lens = context.createRadialGradient(x, y, 0, x, y, radius);
