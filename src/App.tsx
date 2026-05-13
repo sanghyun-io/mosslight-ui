@@ -60,6 +60,39 @@ type ComponentMeta = {
   features: string[];
 };
 
+type PlaygroundValue = string | number | boolean;
+
+type PlaygroundProps = Record<string, PlaygroundValue>;
+
+const defaultPlaygroundProps: PlaygroundProps = {
+  action: true,
+  activationMode: "automatic",
+  accent: "moss",
+  checked: true,
+  collapsible: true,
+  decorative: true,
+  disabled: false,
+  error: false,
+  hasHint: true,
+  hasIcon: true,
+  hasImage: false,
+  hasLabel: true,
+  hasFooter: true,
+  max: 100,
+  orientation: "horizontal",
+  page: 2,
+  required: false,
+  separator: "/",
+  size: "md",
+  skeletonVariant: "block",
+  tone: "moss",
+  totalPages: 5,
+  value: 72,
+  variant: "primary",
+  choice: "comfortable",
+  tooltipCopy: "Soft hint",
+};
+
 const componentCatalog: ComponentMeta[] = [
   {
     id: "button",
@@ -402,16 +435,20 @@ function ComponentsPage({
   setPaginationPage: (page: number) => void;
 }) {
   const [activeComponent, setActiveComponent] = useState(componentCatalog[0].id);
+  const [playgroundProps, setPlaygroundProps] = useState<PlaygroundProps>(defaultPlaygroundProps);
   const selectedComponent =
     componentCatalog.find((component) => component.id === activeComponent) ?? componentCatalog[0];
   const groups = Array.from(new Set(componentCatalog.map((component) => component.group)));
+  const setPlaygroundProp = (name: string, value: PlaygroundValue) => {
+    setPlaygroundProps((current) => ({ ...current, [name]: value }));
+  };
 
   return (
     <section className="page-shell">
       <PageHeading
         eyebrow="Components"
         title="Browse each primitive one at a time."
-        body="Pick a component from the left panel, inspect its core behavior, then compare it with a composed product example."
+        body="Pick a component from the left panel, inspect its base example, then change props to see the output update."
       />
 
       <div className="component-browser">
@@ -471,13 +508,10 @@ function ComponentsPage({
             </div>
           </Card>
 
-          <CompositeExample
-            dialogOpen={dialogOpen}
-            glow={glow}
-            paginationPage={paginationPage}
-            setDialogOpen={setDialogOpen}
-            setGlow={setGlow}
-            setPaginationPage={setPaginationPage}
+          <PropsPlayground
+            component={selectedComponent}
+            props={playgroundProps}
+            setProp={setPlaygroundProp}
           />
         </div>
       </div>
@@ -694,7 +728,7 @@ function renderComponentDemo(
       return (
         <div className="demo-row">
           <Avatar name="Fern Vale" size="sm" />
-          <Avatar name="Stark North" />
+          <Avatar name="North Guard" />
           <Avatar name="Moss Sage" size="lg" />
         </div>
       );
@@ -703,36 +737,208 @@ function renderComponentDemo(
   }
 }
 
-function CompositeExample({
-  glow,
-  paginationPage,
-  setDialogOpen,
-  setGlow,
-  setPaginationPage,
+function PropsPlayground({
+  component,
+  props,
+  setProp,
 }: {
-  dialogOpen: boolean;
-  glow: number;
-  paginationPage: number;
-  setDialogOpen: (open: boolean) => void;
-  setGlow: (value: number) => void;
-  setPaginationPage: (page: number) => void;
+  component: ComponentMeta;
+  props: PlaygroundProps;
+  setProp: (name: string, value: PlaygroundValue) => void;
 }) {
+  const [playgroundDialogOpen, setPlaygroundDialogOpen] = useState(false);
+  const playground = getPlayground(component.id, props, setProp, playgroundDialogOpen, setPlaygroundDialogOpen);
+  const controls = Array.isArray(playground.controls)
+    ? playground.controls.map((control, index) => (
+        <div className="prop-control-slot" key={`${component.id}-${index}`}>
+          {control}
+        </div>
+      ))
+    : playground.controls;
+
   return (
-    <Card accent="moss" className="composite-card">
+    <Card accent={component.tone} className="prop-playground-card">
       <div className="component-detail__header">
         <div>
-          <Badge tone="moss">Combined example</Badge>
-          <h2>Journey settings panel</h2>
-          <p>Several primitives working together as one app surface.</p>
+          <Badge tone={component.tone}>Props playground</Badge>
+          <h2>{component.label} props</h2>
+          <p>Change one prop at a time and watch the preview update.</p>
         </div>
-        <Avatar name="Fern Vale" />
       </div>
 
-      <div className="composite-layout">
-        <div className="stack">
-          <Field label="Traveler" placeholder="Fern" hint="Shared form spacing." />
+      <div className="prop-playground">
+        <div className="prop-controls">{controls}</div>
+        <div className="prop-preview">
+          <div className="prop-preview__label">Preview</div>
+          <div className="prop-preview__stage">{playground.preview}</div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function getPlayground(
+  id: string,
+  props: PlaygroundProps,
+  setProp: (name: string, value: PlaygroundValue) => void,
+  dialogOpen: boolean,
+  setDialogOpen: (open: boolean) => void,
+) {
+  const tone = String(props.tone) as ComponentTone;
+  const accent = String(props.accent) as ComponentTone;
+  const size = String(props.size) as "sm" | "md" | "lg";
+  const value = Number(props.value);
+  const max = Number(props.max);
+  const totalPages = Number(props.totalPages);
+  const page = Math.min(Number(props.page), totalPages);
+  const hasLabel = Boolean(props.hasLabel);
+  const controls: Record<string, ReactNode> = {
+    action: <PropSwitch name="action" label="action" value={props.action} setProp={setProp} />,
+    activationMode: (
+      <PropSelect
+        name="activationMode"
+        label="activationMode"
+        value={String(props.activationMode)}
+        setProp={setProp}
+        options={["automatic", "manual"]}
+      />
+    ),
+    accent: (
+      <PropSelect name="accent" label="accent" value={String(props.accent)} setProp={setProp} options={toneOptions} />
+    ),
+    checked: <PropSwitch name="checked" label="checked" value={props.checked} setProp={setProp} />,
+    collapsible: <PropSwitch name="collapsible" label="collapsible" value={props.collapsible} setProp={setProp} />,
+    decorative: <PropSwitch name="decorative" label="decorative" value={props.decorative} setProp={setProp} />,
+    disabled: <PropSwitch name="disabled" label="disabled" value={props.disabled} setProp={setProp} />,
+    error: <PropSwitch name="error" label="error" value={props.error} setProp={setProp} />,
+    hasFooter: <PropSwitch name="hasFooter" label="footer" value={props.hasFooter} setProp={setProp} />,
+    hasHint: <PropSwitch name="hasHint" label="hint" value={props.hasHint} setProp={setProp} />,
+    hasIcon: <PropSwitch name="hasIcon" label="icon" value={props.hasIcon} setProp={setProp} />,
+    hasImage: <PropSwitch name="hasImage" label="src" value={props.hasImage} setProp={setProp} />,
+    hasLabel: <PropSwitch name="hasLabel" label="label" value={props.hasLabel} setProp={setProp} />,
+    max: <PropSlider name="max" label="max" min={60} max={140} value={max} setProp={setProp} />,
+    orientation: (
+      <PropSelect
+        name="orientation"
+        label="orientation"
+        value={String(props.orientation)}
+        setProp={setProp}
+        options={["horizontal", "vertical"]}
+      />
+    ),
+    page: <PropSlider name="page" label="page" min={1} max={totalPages} value={page} setProp={setProp} />,
+    required: <PropSwitch name="required" label="required" value={props.required} setProp={setProp} />,
+    separator: (
+      <PropSelect name="separator" label="separator" value={String(props.separator)} setProp={setProp} options={["/", ">", "-"]} />
+    ),
+    size: <PropSelect name="size" label="size" value={String(props.size)} setProp={setProp} options={["sm", "md", "lg"]} />,
+    skeletonVariant: (
+      <PropSelect
+        name="skeletonVariant"
+        label="variant"
+        value={String(props.skeletonVariant)}
+        setProp={setProp}
+        options={["block", "text"]}
+      />
+    ),
+    tone: <PropSelect name="tone" label="tone" value={String(props.tone)} setProp={setProp} options={toneOptions} />,
+    tooltipCopy: (
+      <PropSelect
+        name="tooltipCopy"
+        label="content"
+        value={String(props.tooltipCopy)}
+        setProp={setProp}
+        options={["Soft hint", "Keyboard accessible", "Compact context"]}
+      />
+    ),
+    totalPages: <PropSlider name="totalPages" label="totalPages" min={2} max={8} value={totalPages} setProp={setProp} />,
+    value: <PropSlider name="value" label="value" min={0} max={max} value={Math.min(value, max)} setProp={setProp} />,
+    variant: (
+      <PropSelect
+        name="variant"
+        label="variant"
+        value={String(props.variant)}
+        setProp={setProp}
+        options={["primary", "secondary", "ghost", "danger"]}
+      />
+    ),
+    choice: (
+      <PropSelect
+        name="choice"
+        label="value"
+        value={String(props.choice)}
+        setProp={setProp}
+        options={["compact", "comfortable", "spacious"]}
+      />
+    ),
+  };
+
+  switch (id) {
+    case "button":
+      return {
+        controls: [controls.variant, controls.size, controls.hasIcon, controls.disabled],
+        preview: (
+          <Button
+            variant={String(props.variant) as "primary" | "secondary" | "ghost" | "danger"}
+            size={size}
+            disabled={Boolean(props.disabled)}
+            icon={props.hasIcon ? <Wand2 size={16} /> : undefined}
+          >
+            Button
+          </Button>
+        ),
+      };
+    case "badge":
+      return {
+        controls: [controls.tone],
+        preview: <Badge tone={tone}>Badge</Badge>,
+      };
+    case "tooltip":
+      return {
+        controls: [controls.tooltipCopy],
+        preview: (
+          <Tooltip content={String(props.tooltipCopy)}>
+            <button className="utility-help" type="button">
+              ?
+            </button>
+          </Tooltip>
+        ),
+      };
+    case "toast":
+      return {
+        controls: [controls.tone, controls.action],
+        preview: (
+          <ToastViewport>
+            <Toast title="Status updated" tone={tone} action={props.action ? <Button size="sm">Undo</Button> : undefined}>
+              The action prop controls the trailing command slot.
+            </Toast>
+          </ToastViewport>
+        ),
+      };
+    case "field":
+      return {
+        controls: [controls.required, controls.disabled, controls.hasHint, controls.error],
+        preview: (
+          <Field
+            label="Traveler"
+            placeholder="Fern"
+            required={Boolean(props.required)}
+            disabled={Boolean(props.disabled)}
+            hint={props.hasHint ? "Hint text is controlled by the hint prop." : undefined}
+            error={props.error ? "Error text changes the invalid state." : undefined}
+          />
+        ),
+      };
+    case "select":
+      return {
+        controls: [controls.required, controls.disabled, controls.hasHint, controls.error],
+        preview: (
           <Select
             label="Region"
+            required={Boolean(props.required)}
+            disabled={Boolean(props.disabled)}
+            hint={props.hasHint ? "Hint text is controlled by the hint prop." : undefined}
+            error={props.error ? "Error text changes the invalid state." : undefined}
             defaultValue="lake"
             options={[
               { label: "Lake village", value: "lake" },
@@ -740,33 +946,281 @@ function CompositeExample({
               { label: "Old woods", value: "woods" },
             ]}
           />
-          <Checkbox label="Remember route" defaultChecked />
-          <Switch label="Campfire mode" defaultChecked />
-        </div>
-
-        <div className="stack">
-          <Alert title="Draft saved" tone="plum" icon={<Sparkles size={18} />}>
-            Feedback, actions, and form controls share the same token system.
-          </Alert>
+        ),
+      };
+    case "checkbox":
+      return {
+        controls: [controls.checked, controls.disabled, controls.hasHint],
+        preview: (
+          <Checkbox
+            label="Remember route"
+            checked={Boolean(props.checked)}
+            disabled={Boolean(props.disabled)}
+            hint={props.hasHint ? "The hint prop renders helper text." : undefined}
+            onChange={(event) => setProp("checked", event.currentTarget.checked)}
+          />
+        ),
+      };
+    case "switch":
+      return {
+        controls: [controls.checked, controls.disabled],
+        preview: (
+          <Switch
+            label="Campfire mode"
+            checked={Boolean(props.checked)}
+            disabled={Boolean(props.disabled)}
+            onChange={(event) => setProp("checked", event.currentTarget.checked)}
+          />
+        ),
+      };
+    case "radio-group":
+      return {
+        controls: [controls.choice, controls.disabled],
+        preview: (
+          <RadioGroup
+            label="Density"
+            name="playground-density"
+            value={String(props.choice)}
+            disabled={Boolean(props.disabled)}
+            onChange={(event) => setProp("choice", event.currentTarget.value)}
+            options={[
+              { label: "Compact", value: "compact" },
+              { label: "Comfortable", value: "comfortable" },
+              { label: "Spacious", value: "spacious" },
+            ]}
+          />
+        ),
+      };
+    case "slider":
+      return {
+        controls: [controls.value, controls.max, controls.hasLabel],
+        preview: (
           <Slider
             label="Ambient glow"
-            min={20}
-            max={100}
-            value={glow}
-            output={`${glow}%`}
-            onChange={(event) => setGlow(Number(event.currentTarget.value))}
+            min={0}
+            max={max}
+            value={Math.min(value, max)}
+            output={props.hasLabel ? `${Math.min(value, max)} / ${max}` : undefined}
+            onChange={(event) => setProp("value", Number(event.currentTarget.value))}
           />
-          <Progress value={glow} label="Mood balance" />
-          <Pagination page={paginationPage} totalPages={4} onPageChange={setPaginationPage} />
-          <div className="demo-row">
-            <Button icon={<Check size={16} />}>Save</Button>
-            <Button variant="secondary" onClick={() => setDialogOpen(true)}>
-              Review
-            </Button>
+        ),
+      };
+    case "card":
+      return {
+        controls: [controls.accent],
+        preview: (
+          <Card accent={accent}>
+            <Badge tone={accent}>Card</Badge>
+            <p>The accent prop changes the border and highlight tone.</p>
+          </Card>
+        ),
+      };
+    case "accordion":
+      return {
+        controls: [controls.collapsible, controls.choice],
+        preview: (
+          <Accordion
+            key={`${props.collapsible}-${props.choice}`}
+            collapsible={Boolean(props.collapsible)}
+            defaultValue={String(props.choice)}
+            items={[
+              { title: "Compact", value: "compact", content: "defaultValue opens this item first." },
+              { title: "Comfortable", value: "comfortable", content: "collapsible controls whether the open item can close." },
+              { title: "Spacious", value: "spacious", content: "Keyboard movement still works across triggers." },
+            ]}
+          />
+        ),
+      };
+    case "tabs":
+      return {
+        controls: [controls.orientation, controls.activationMode, controls.choice],
+        preview: (
+          <Tabs
+            key={`${props.orientation}-${props.activationMode}-${props.choice}`}
+            orientation={String(props.orientation) as "horizontal" | "vertical"}
+            activationMode={String(props.activationMode) as "automatic" | "manual"}
+            defaultValue={String(props.choice)}
+            items={[
+              { label: "Compact", value: "compact", content: "defaultValue selects the initial panel." },
+              { label: "Comfortable", value: "comfortable", content: "orientation changes keyboard direction." },
+              { label: "Spacious", value: "spacious", content: "manual activation waits for Enter or Space." },
+            ]}
+          />
+        ),
+      };
+    case "breadcrumb":
+      return {
+        controls: [controls.separator],
+        preview: (
+          <Breadcrumb
+            separator={String(props.separator)}
+            items={[
+              { label: "Mosslight", href: "#" },
+              { label: "Components", href: "#" },
+              { label: "Breadcrumb", current: true },
+            ]}
+          />
+        ),
+      };
+    case "pagination":
+      return {
+        controls: [controls.totalPages, controls.page],
+        preview: <Pagination page={page} totalPages={totalPages} onPageChange={(nextPage) => setProp("page", nextPage)} />,
+      };
+    case "separator":
+      return {
+        controls: [controls.orientation, controls.decorative],
+        preview: (
+          <div className="separator-demo">
+            <span>Before</span>
+            <Separator
+              orientation={String(props.orientation) as "horizontal" | "vertical"}
+              decorative={Boolean(props.decorative)}
+            />
+            <span>After</span>
           </div>
-        </div>
-      </div>
-    </Card>
+        ),
+      };
+    case "alert":
+      return {
+        controls: [controls.tone, controls.hasIcon],
+        preview: (
+          <Alert title="Draft saved" tone={tone} icon={props.hasIcon ? <Sparkles size={18} /> : undefined}>
+            The tone and icon props reshape the same feedback message.
+          </Alert>
+        ),
+      };
+    case "dialog":
+      return {
+        controls: [controls.hasFooter, controls.hasHint],
+        preview: (
+          <>
+            <Button variant="secondary" onClick={() => setDialogOpen(true)}>
+              Open dialog
+            </Button>
+            <Dialog
+              open={dialogOpen}
+              title="Confirm journey"
+              description={props.hasHint ? "description adds supporting copy below the title." : undefined}
+              onOpenChange={setDialogOpen}
+              footer={
+                props.hasFooter ? (
+                  <>
+                    <Button variant="ghost" onClick={() => setDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={() => setDialogOpen(false)}>Confirm</Button>
+                  </>
+                ) : undefined
+              }
+            >
+              <p className="dialog-copy">Children render inside the dialog body.</p>
+            </Dialog>
+          </>
+        ),
+      };
+    case "progress":
+      return {
+        controls: [controls.value, controls.max, controls.hasLabel],
+        preview: <Progress value={Math.min(value, max)} max={max} label={hasLabel ? "Readiness" : undefined} />,
+      };
+    case "skeleton":
+      return {
+        controls: [controls.skeletonVariant],
+        preview: <Skeleton variant={String(props.skeletonVariant) as "block" | "text"} />,
+      };
+    case "spinner":
+      return {
+        controls: [controls.size, controls.hasLabel],
+        preview: <Spinner size={size} label={hasLabel ? "Loading preview" : ""} />,
+      };
+    case "avatar":
+      return {
+        controls: [controls.size, controls.hasImage],
+        preview: (
+          <Avatar
+            name="Fern Vale"
+            size={size}
+            src={props.hasImage ? "https://github.com/sanghyun-io.png" : undefined}
+          />
+        ),
+      };
+    default:
+      return { controls: null, preview: null };
+  }
+}
+
+const toneOptions = ["moss", "sky", "amber", "plum"];
+
+function PropSelect({
+  name,
+  label,
+  value,
+  options,
+  setProp,
+}: {
+  name: string;
+  label: string;
+  value: string;
+  options: string[];
+  setProp: (name: string, value: PlaygroundValue) => void;
+}) {
+  return (
+    <Select
+      id={`prop-${name}`}
+      label={label}
+      value={value}
+      onChange={(event) => setProp(name, event.currentTarget.value)}
+      options={options.map((option) => ({ label: option, value: option }))}
+    />
+  );
+}
+
+function PropSwitch({
+  name,
+  label,
+  value,
+  setProp,
+}: {
+  name: string;
+  label: string;
+  value: PlaygroundValue;
+  setProp: (name: string, value: PlaygroundValue) => void;
+}) {
+  return (
+    <Switch
+      id={`prop-${name}`}
+      label={label}
+      checked={Boolean(value)}
+      onChange={(event) => setProp(name, event.currentTarget.checked)}
+    />
+  );
+}
+
+function PropSlider({
+  name,
+  label,
+  min,
+  max,
+  value,
+  setProp,
+}: {
+  name: string;
+  label: string;
+  min: number;
+  max: number;
+  value: number;
+  setProp: (name: string, value: PlaygroundValue) => void;
+}) {
+  return (
+    <Slider
+      label={label}
+      min={min}
+      max={max}
+      value={value}
+      output={String(value)}
+      onChange={(event) => setProp(name, Number(event.currentTarget.value))}
+    />
   );
 }
 
