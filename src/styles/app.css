@@ -62,6 +62,19 @@
   z-index: 77;
 }
 
+.site-shell [data-warp-pulled="true"] {
+  filter: blur(var(--warp-pull-blur, 0)) saturate(var(--warp-pull-saturate, 1)) !important;
+  transform: translate3d(var(--warp-pull-x, 0), var(--warp-pull-y, 0), 0) scale(var(--warp-pull-scale, 1)) !important;
+  transition:
+    filter 70ms linear,
+    transform 70ms linear !important;
+  will-change: filter, transform;
+}
+
+.site-shell[data-warping="true"] [data-warp-pulled="true"] {
+  z-index: 78;
+}
+
 .cursor-trail {
   animation: cursor-trail-fade 520ms ease-out both;
   height: 1.2rem;
@@ -1486,6 +1499,12 @@
   .night-hollow-canvas,
   .cursor-trail-layer {
     display: none;
+  }
+
+  .site-shell [data-warp-pulled="true"] {
+    filter: none !important;
+    transform: none !important;
+    transition: none !important;
   }
 
   .anime-stage,

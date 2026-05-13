@@ -1,5 +1,5 @@
 import type { CSSProperties, FormEvent, PointerEvent, ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import {
   ArrowRight,
@@ -54,6 +54,101 @@ type TypingTrail = {
 };
 type CursorTrail = { id: number; x: number; y: number; length: number; angle: number; tone: "sky" | "amber" | "plum" };
 type WarpPoint = { active: boolean; x: number; y: number };
+
+const warpAttractionSelector = [
+  ".site-header",
+  ".hero-copy",
+  ".hero-actions .ms-button",
+  ".anime-stage",
+  ".feature-grid > *",
+  ".showcase-grid > *",
+  ".component-sidebar",
+  ".component-menu__item",
+  ".component-detail-card",
+  ".prop-playground-card",
+  ".component-demo-surface",
+  ".prop-preview",
+  ".prop-code",
+  ".pattern-grid > *",
+  ".token-swatch",
+  ".install-grid > *",
+  ".code-panel",
+  ".ms-card",
+  ".ms-button",
+  ".ms-alert",
+  ".ms-toast",
+  ".ms-field",
+  ".ms-form-control",
+  ".ms-tabs",
+  ".ms-pagination",
+  ".ms-switch",
+  ".ms-checkbox",
+  ".ms-radio",
+  ".ms-slider",
+  ".ms-progress",
+  ".ms-avatar",
+  ".ms-badge",
+].join(",");
+
+const warpAttractionSkipSelector = [
+  ".night-hollow-canvas",
+  ".cursor-trail-layer",
+  ".spell-impact-layer",
+  ".typing-spell-layer",
+].join(",");
+
+function clearWarpTargetStyles(targets: HTMLElement[]) {
+  targets.forEach((target) => {
+    target.removeAttribute("data-warp-pulled");
+    target.style.removeProperty("--warp-pull-x");
+    target.style.removeProperty("--warp-pull-y");
+    target.style.removeProperty("--warp-pull-scale");
+    target.style.removeProperty("--warp-pull-blur");
+    target.style.removeProperty("--warp-pull-saturate");
+  });
+}
+
+function markCaptureCloneSafe(documentClone: Document) {
+  const style = documentClone.createElement("style");
+  style.textContent = `
+    .site-shell,
+    .site-shell * {
+      background-image: none !important;
+      border-color: rgba(37, 49, 55, 0.22) !important;
+      box-shadow: none !important;
+      color: #253137 !important;
+      filter: none !important;
+      text-shadow: none !important;
+    }
+
+    .site-shell {
+      background: #f4efdf !important;
+    }
+
+    .site-header,
+    .component-sidebar,
+    .component-detail-card,
+    .prop-playground-card,
+    .component-demo-surface,
+    .prop-preview,
+    .code-panel,
+    .ms-card,
+    .ms-alert,
+    .ms-toast,
+    .ms-field,
+    .ms-form-control {
+      background-color: rgba(255, 250, 240, 0.82) !important;
+    }
+
+    .ms-button,
+    .component-menu__item,
+    .token-swatch,
+    .ms-badge {
+      background-color: rgba(229, 219, 188, 0.82) !important;
+    }
+  `;
+  documentClone.head.appendChild(style);
+}
 
 const pages: Array<{ value: Page }> = [
   { value: "home" },
@@ -783,6 +878,8 @@ function App() {
   const [warpPoint, setWarpPoint] = useState<WarpPoint>({ active: false, x: 0, y: 0 });
   const lastCursorPoint = useRef<{ x: number; y: number; time: number } | null>(null);
   const previousCaretByField = useRef(new WeakMap<HTMLInputElement | HTMLTextAreaElement, number>());
+  const warpAttractionFrame = useRef<number | null>(null);
+  const warpAttractionTargets = useRef<HTMLElement[]>([]);
   const t = copy[lang];
 
   useEffect(() => {
@@ -808,10 +905,74 @@ function App() {
     }
   };
 
+  const clearWarpAttraction = useCallback(() => {
+    if (warpAttractionFrame.current !== null) {
+      window.cancelAnimationFrame(warpAttractionFrame.current);
+      warpAttractionFrame.current = null;
+    }
+    clearWarpTargetStyles(warpAttractionTargets.current);
+    warpAttractionTargets.current = [];
+  }, []);
+
+  const releaseWarp = useCallback(() => {
+    clearWarpAttraction();
+    setWarpPoint((current) => ({ ...current, active: false }));
+  }, [clearWarpAttraction]);
+
+  const applyWarpAttraction = useCallback((x: number, y: number) => {
+    if (import.meta.env.MODE === "test" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    if (warpAttractionFrame.current !== null) {
+      window.cancelAnimationFrame(warpAttractionFrame.current);
+    }
+
+    warpAttractionFrame.current = window.requestAnimationFrame(() => {
+      warpAttractionFrame.current = null;
+      const root = document.querySelector(".site-shell");
+      if (!root) return;
+
+      clearWarpTargetStyles(warpAttractionTargets.current);
+
+      const candidates = Array.from(root.querySelectorAll<HTMLElement>(warpAttractionSelector));
+      const nextTargets: HTMLElement[] = [];
+      const seen = new Set<HTMLElement>();
+      const radius = 430;
+
+      candidates.forEach((target) => {
+        if (seen.has(target) || target.matches(warpAttractionSkipSelector) || target.closest(warpAttractionSkipSelector)) return;
+        seen.add(target);
+
+        const rect = target.getBoundingClientRect();
+        if (rect.width < 8 || rect.height < 8) return;
+
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = x - centerX;
+        const dy = y - centerY;
+        const distance = Math.hypot(dx, dy);
+        if (distance > radius) return;
+
+        const falloff = 1 - distance / radius;
+        const pull = falloff * falloff * 74;
+        const unitX = dx / Math.max(distance, 1);
+        const unitY = dy / Math.max(distance, 1);
+
+        target.dataset.warpPulled = "true";
+        target.style.setProperty("--warp-pull-x", `${unitX * pull}px`);
+        target.style.setProperty("--warp-pull-y", `${unitY * pull}px`);
+        target.style.setProperty("--warp-pull-scale", `${1 - falloff * 0.045}`);
+        target.style.setProperty("--warp-pull-blur", `${falloff * 0.78}px`);
+        target.style.setProperty("--warp-pull-saturate", `${1 + falloff * 0.2}`);
+        nextTargets.push(target);
+      });
+
+      warpAttractionTargets.current = nextTargets;
+    });
+  }, []);
+
   useEffect(() => {
     if (!warpPoint.active) return;
 
-    const releaseWarp = () => setWarpPoint((current) => ({ ...current, active: false }));
     window.addEventListener("pointerup", releaseWarp);
     window.addEventListener("pointercancel", releaseWarp);
     window.addEventListener("blur", releaseWarp);
@@ -820,7 +981,13 @@ function App() {
       window.removeEventListener("pointercancel", releaseWarp);
       window.removeEventListener("blur", releaseWarp);
     };
-  }, [warpPoint.active]);
+  }, [releaseWarp, warpPoint.active]);
+
+  useEffect(() => {
+    clearWarpAttraction();
+  }, [clearWarpAttraction, page]);
+
+  useEffect(() => () => clearWarpAttraction(), [clearWarpAttraction]);
 
   const castInteractionSpell = (event: PointerEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
@@ -864,11 +1031,15 @@ function App() {
       setCursorTrails((current) => current.filter((trail) => trail.id !== id));
     }, 520);
     lastCursorPoint.current = { x: event.clientX, y: event.clientY, time: now };
-    if (warpPoint.active) setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
+    if (warpPoint.active) {
+      setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
+      applyWarpAttraction(event.clientX, event.clientY);
+    }
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
     setWarpPoint({ active: true, x: event.clientX, y: event.clientY });
+    applyWarpAttraction(event.clientX, event.clientY);
     castInteractionSpell(event);
   };
 
@@ -906,10 +1077,10 @@ function App() {
       data-ms-theme={dark ? "dark" : undefined}
       data-warping={warpPoint.active ? "true" : undefined}
       onInputCapture={castTypingTrail}
-      onPointerCancelCapture={() => setWarpPoint((current) => ({ ...current, active: false }))}
+      onPointerCancelCapture={releaseWarp}
       onPointerDownCapture={handlePointerDown}
       onPointerMoveCapture={castCursorTrail}
-      onPointerUpCapture={() => setWarpPoint((current) => ({ ...current, active: false }))}
+      onPointerUpCapture={releaseWarp}
     >
       <NightHollowCanvas warpPoint={warpPoint} />
 
@@ -1044,8 +1215,11 @@ function NightHollowCanvas({ warpPoint }: { warpPoint: WarpPoint }) {
         element.classList.contains("cursor-trail-layer") ||
         element.classList.contains("spell-impact-layer") ||
         element.classList.contains("typing-spell-layer"),
+      onclone: markCaptureCloneSafe,
     }).then((capture) => {
       if (!cancelled) captureRef.current = capture;
+    }).catch(() => {
+      if (!cancelled) captureRef.current = null;
     });
 
     return () => {
