@@ -477,39 +477,9 @@
     0 24px 54px rgba(57, 87, 66, 0.12);
   display: grid;
   gap: var(--ms-space-5);
-  max-height: calc(100vh - 7rem);
-  overflow: auto;
   padding: var(--ms-space-4);
   position: sticky;
-  scrollbar-color: color-mix(in srgb, var(--ms-color-moss-700) 58%, transparent) transparent;
-  scrollbar-width: thin;
   top: 6rem;
-}
-
-.component-sidebar::-webkit-scrollbar {
-  width: 0.7rem;
-}
-
-.component-sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.component-sidebar::-webkit-scrollbar-thumb {
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--ms-color-moss-700) 72%, var(--ms-color-sky-400)),
-      color-mix(in srgb, var(--ms-color-plum-500) 42%, var(--ms-color-moss-700))
-    );
-  border: 3px solid transparent;
-  border-radius: var(--ms-radius-pill);
-  background-clip: content-box;
-}
-
-.component-sidebar::-webkit-scrollbar-thumb:hover {
-  background:
-    linear-gradient(180deg, var(--ms-color-moss-700), color-mix(in srgb, var(--ms-color-plum-500) 56%, var(--ms-color-moss-700)));
-  background-clip: content-box;
 }
 
 .component-sidebar__intro {
@@ -859,7 +829,6 @@
   }
 
   .component-sidebar {
-    max-height: none;
     position: static;
   }
 
