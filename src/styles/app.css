@@ -75,12 +75,12 @@
 
 .cursor-trail::before {
   background:
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--cursor-color, var(--ms-color-sky-400)) 82%, white), rgba(255, 250, 240, 0.92)),
-    repeating-linear-gradient(90deg, transparent 0 0.42rem, rgba(255, 250, 240, 0.62) 0.46rem 0.52rem, transparent 0.56rem 0.82rem);
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--cursor-color, var(--ms-magic-sky)) 82%, var(--ms-magic-gleam)), var(--ms-magic-paper)),
+    repeating-linear-gradient(90deg, transparent 0 0.42rem, var(--ms-magic-gleam-soft) 0.46rem 0.52rem, transparent 0.56rem 0.82rem);
   border-radius: var(--ms-radius-pill);
   box-shadow:
-    0 0 14px color-mix(in srgb, var(--cursor-color, var(--ms-color-sky-400)) 56%, transparent),
-    0 0 30px color-mix(in srgb, var(--cursor-color, var(--ms-color-sky-400)) 28%, transparent);
+    0 0 14px color-mix(in srgb, var(--cursor-color, var(--ms-magic-sky)) 56%, transparent),
+    0 0 30px color-mix(in srgb, var(--cursor-color, var(--ms-magic-sky)) 28%, transparent);
   height: 0.24rem;
   right: 0;
   top: calc(50% - 0.12rem);
@@ -88,7 +88,7 @@
 }
 
 .cursor-trail::after {
-  background: radial-gradient(circle, rgba(255, 250, 240, 0.9), transparent 68%);
+  background: radial-gradient(circle, var(--ms-magic-gleam), transparent 68%);
   border-radius: 50%;
   height: 0.82rem;
   right: -0.2rem;
@@ -97,15 +97,15 @@
 }
 
 .cursor-trail--sky {
-  --cursor-color: var(--ms-color-sky-400);
+  --cursor-color: var(--ms-magic-sky);
 }
 
 .cursor-trail--amber {
-  --cursor-color: var(--ms-color-amber-400);
+  --cursor-color: var(--ms-magic-amber);
 }
 
 .cursor-trail--plum {
-  --cursor-color: var(--ms-color-plum-500);
+  --cursor-color: var(--ms-magic-plum);
 }
 
 .spell-impact-layer {
@@ -143,19 +143,19 @@
 
 .spell-impact::before {
   background:
-    radial-gradient(circle, rgba(255, 250, 240, 0.96) 0 0.32rem, transparent 0.36rem),
-    conic-gradient(from 12deg, transparent 0 8%, rgba(255, 250, 240, 0.95) 9% 10%, transparent 11% 24%, rgba(226, 183, 94, 0.86) 25% 27%, transparent 28% 44%, rgba(158, 194, 207, 0.92) 45% 47%, transparent 48% 68%, rgba(132, 82, 120, 0.72) 69% 71%, transparent 72%);
+    radial-gradient(circle, var(--ms-magic-gleam) 0 0.32rem, transparent 0.36rem),
+    conic-gradient(from 12deg, transparent 0 8%, var(--ms-magic-gleam) 9% 10%, transparent 11% 24%, color-mix(in srgb, var(--ms-magic-amber) 86%, transparent) 25% 27%, transparent 28% 44%, color-mix(in srgb, var(--ms-magic-sky) 92%, transparent) 45% 47%, transparent 48% 68%, color-mix(in srgb, var(--ms-magic-plum) 72%, transparent) 69% 71%, transparent 72%);
   border-radius: 50%;
-  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--ms-color-amber-400) 58%, transparent));
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--ms-magic-amber) 58%, transparent));
   mask: radial-gradient(circle, transparent 0 32%, #000 33% 48%, transparent 49%);
 }
 
 .spell-impact::after {
   background:
-    linear-gradient(90deg, transparent 0 18%, rgba(255, 250, 240, 0.98) 49%, transparent 82%),
-    linear-gradient(0deg, transparent 0 18%, rgba(158, 194, 207, 0.92) 49%, transparent 82%),
-    linear-gradient(135deg, transparent 0 28%, rgba(226, 183, 94, 0.88) 49%, transparent 70%),
-    linear-gradient(45deg, transparent 0 28%, rgba(255, 250, 240, 0.82) 49%, transparent 70%);
+    linear-gradient(90deg, transparent 0 18%, var(--ms-magic-gleam) 49%, transparent 82%),
+    linear-gradient(0deg, transparent 0 18%, color-mix(in srgb, var(--ms-magic-sky) 92%, transparent) 49%, transparent 82%),
+    linear-gradient(135deg, transparent 0 28%, color-mix(in srgb, var(--ms-magic-amber) 88%, transparent) 49%, transparent 70%),
+    linear-gradient(45deg, transparent 0 28%, var(--ms-magic-paper) 49%, transparent 70%);
   border-radius: 50%;
   mix-blend-mode: screen;
 }
@@ -179,12 +179,12 @@
 
 .typing-spell::before {
   background:
-    linear-gradient(90deg, transparent 0, rgba(255, 250, 240, 0.26) 12%, rgba(255, 250, 240, 0.92) 72%, transparent 100%),
-    repeating-linear-gradient(90deg, transparent 0 0.6rem, rgba(255, 250, 240, 0.42) 0.64rem 0.72rem, transparent 0.78rem 1.05rem);
+    linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--ms-magic-gleam) 26%, transparent) 12%, var(--ms-magic-gleam) 72%, transparent 100%),
+    repeating-linear-gradient(90deg, transparent 0 0.6rem, var(--ms-magic-gleam-soft) 0.64rem 0.72rem, transparent 0.78rem 1.05rem);
   border-radius: var(--ms-radius-pill);
   box-shadow:
-    0 0 16px color-mix(in srgb, var(--typing-color, var(--ms-color-sky-400)) 58%, transparent),
-    0 0 34px color-mix(in srgb, var(--typing-color, var(--ms-color-sky-400)) 34%, transparent);
+    0 0 16px color-mix(in srgb, var(--typing-color, var(--ms-magic-sky)) 58%, transparent),
+    0 0 34px color-mix(in srgb, var(--typing-color, var(--ms-magic-sky)) 34%, transparent);
   height: 0.28rem;
   left: 0;
   top: calc(50% - 0.14rem);
@@ -194,10 +194,10 @@
 .typing-spell::after {
   animation: typing-caret-dodge 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
   background:
-    radial-gradient(circle, rgba(255, 250, 240, 0.98) 0 0.28rem, transparent 0.34rem),
-    conic-gradient(from 120deg, transparent, var(--typing-color, var(--ms-color-sky-400)), transparent 42%, rgba(255, 250, 240, 0.9), transparent 68%);
+    radial-gradient(circle, var(--ms-magic-gleam) 0 0.28rem, transparent 0.34rem),
+    conic-gradient(from 120deg, transparent, var(--typing-color, var(--ms-magic-sky)), transparent 42%, var(--ms-magic-paper), transparent 68%);
   border-radius: 50%;
-  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--typing-color, var(--ms-color-sky-400)) 68%, transparent));
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--typing-color, var(--ms-magic-sky)) 68%, transparent));
   height: 1.65rem;
   right: 0.18rem;
   top: calc(50% - 0.82rem);
@@ -205,15 +205,15 @@
 }
 
 .typing-spell--bolt {
-  --typing-color: var(--ms-color-sky-400);
+  --typing-color: var(--ms-magic-sky);
 }
 
 .typing-spell--ember {
-  --typing-color: var(--ms-color-amber-400);
+  --typing-color: var(--ms-magic-amber);
 }
 
 .typing-spell--frost {
-  --typing-color: #9ed8ef;
+  --typing-color: var(--ms-magic-frost);
 }
 
 .typing-spell[data-direction="backward"] {

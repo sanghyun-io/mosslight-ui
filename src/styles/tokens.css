@@ -33,6 +33,13 @@
   --ms-accent-secondary: var(--ms-color-sky-400);
   --ms-accent-warning: var(--ms-color-amber-400);
   --ms-accent-danger: var(--ms-color-rose-500);
+  --ms-magic-sky: #176f86;
+  --ms-magic-amber: #9f5b12;
+  --ms-magic-plum: #723274;
+  --ms-magic-frost: #1c6f97;
+  --ms-magic-gleam: rgba(39, 50, 56, 0.92);
+  --ms-magic-gleam-soft: rgba(39, 50, 56, 0.38);
+  --ms-magic-paper: rgba(255, 250, 240, 0.68);
 
   --ms-space-1: 0.25rem;
   --ms-space-2: 0.5rem;
@@ -88,6 +95,13 @@
   --ms-accent-secondary: var(--ms-color-sky-400);
   --ms-accent-warning: var(--ms-color-amber-400);
   --ms-accent-danger: var(--ms-color-rose-500);
+  --ms-magic-sky: #9eeaff;
+  --ms-magic-amber: #ffd36e;
+  --ms-magic-plum: #f0a6ff;
+  --ms-magic-frost: #c6f4ff;
+  --ms-magic-gleam: rgba(255, 250, 240, 0.96);
+  --ms-magic-gleam-soft: rgba(255, 250, 240, 0.46);
+  --ms-magic-paper: rgba(255, 250, 240, 0.86);
   --ms-border-ink: 1px solid rgba(245, 239, 217, 0.18);
   --ms-focus: 0 0 0 4px rgba(134, 180, 192, 0.42);
 }
