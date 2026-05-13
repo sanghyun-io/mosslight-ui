@@ -599,6 +599,34 @@
   min-width: 0;
 }
 
+.prop-code {
+  background: var(--ms-color-ink-800);
+  border: var(--ms-border-ink);
+  border-radius: var(--ms-radius-md);
+  color: var(--ms-color-paper);
+  display: grid;
+  gap: var(--ms-space-3);
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding: var(--ms-space-4);
+}
+
+.prop-code .prop-preview__label {
+  color: color-mix(in srgb, var(--ms-color-paper) 72%, transparent);
+}
+
+.prop-code pre {
+  margin: 0;
+  overflow: auto;
+}
+
+.prop-code code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.84rem;
+  line-height: 1.65;
+  white-space: pre;
+}
+
 .separator-demo {
   align-items: stretch;
   display: flex;

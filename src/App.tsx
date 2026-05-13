@@ -78,6 +78,8 @@ const defaultPlaygroundProps: PlaygroundProps = {
   hasImage: false,
   hasLabel: true,
   hasFooter: true,
+  closeOnEscape: true,
+  closeOnInteractOutside: true,
   max: 100,
   orientation: "horizontal",
   page: 2,
@@ -90,6 +92,8 @@ const defaultPlaygroundProps: PlaygroundProps = {
   value: 72,
   variant: "primary",
   choice: "comfortable",
+  alertTone: "plum",
+  loadingLabel: "Loading preview",
   tooltipCopy: "Soft hint",
 };
 
@@ -748,6 +752,7 @@ function PropsPlayground({
 }) {
   const [playgroundDialogOpen, setPlaygroundDialogOpen] = useState(false);
   const playground = getPlayground(component.id, props, setProp, playgroundDialogOpen, setPlaygroundDialogOpen);
+  const code = getPlaygroundCode(component.id, props);
   const controls = Array.isArray(playground.controls)
     ? playground.controls.map((control, index) => (
         <div className="prop-control-slot" key={`${component.id}-${index}`}>
@@ -772,6 +777,12 @@ function PropsPlayground({
           <div className="prop-preview__label">Preview</div>
           <div className="prop-preview__stage">{playground.preview}</div>
         </div>
+        <div className="prop-code">
+          <div className="prop-preview__label">Code</div>
+          <pre>
+            <code>{code}</code>
+          </pre>
+        </div>
       </div>
     </Card>
   );
@@ -792,6 +803,7 @@ function getPlayground(
   const totalPages = Number(props.totalPages);
   const page = Math.min(Number(props.page), totalPages);
   const hasLabel = Boolean(props.hasLabel);
+  const alertTone = String(props.alertTone) as "moss" | "sky" | "amber" | "plum" | "danger";
   const controls: Record<string, ReactNode> = {
     action: <PropSwitch name="action" label="action" value={props.action} setProp={setProp} />,
     activationMode: (
@@ -811,6 +823,15 @@ function getPlayground(
     decorative: <PropSwitch name="decorative" label="decorative" value={props.decorative} setProp={setProp} />,
     disabled: <PropSwitch name="disabled" label="disabled" value={props.disabled} setProp={setProp} />,
     error: <PropSwitch name="error" label="error" value={props.error} setProp={setProp} />,
+    closeOnEscape: <PropSwitch name="closeOnEscape" label="closeOnEscape" value={props.closeOnEscape} setProp={setProp} />,
+    closeOnInteractOutside: (
+      <PropSwitch
+        name="closeOnInteractOutside"
+        label="closeOnInteractOutside"
+        value={props.closeOnInteractOutside}
+        setProp={setProp}
+      />
+    ),
     hasFooter: <PropSwitch name="hasFooter" label="footer" value={props.hasFooter} setProp={setProp} />,
     hasHint: <PropSwitch name="hasHint" label="hint" value={props.hasHint} setProp={setProp} />,
     hasIcon: <PropSwitch name="hasIcon" label="icon" value={props.hasIcon} setProp={setProp} />,
@@ -838,10 +859,28 @@ function getPlayground(
         label="variant"
         value={String(props.skeletonVariant)}
         setProp={setProp}
-        options={["block", "text"]}
+        options={["block", "text", "circle"]}
       />
     ),
     tone: <PropSelect name="tone" label="tone" value={String(props.tone)} setProp={setProp} options={toneOptions} />,
+    alertTone: (
+      <PropSelect
+        name="alertTone"
+        label="tone"
+        value={String(props.alertTone)}
+        setProp={setProp}
+        options={alertToneOptions}
+      />
+    ),
+    loadingLabel: (
+      <PropSelect
+        name="loadingLabel"
+        label="label"
+        value={String(props.loadingLabel)}
+        setProp={setProp}
+        options={["Loading preview", "Syncing route", "Preparing map"]}
+      />
+    ),
     tooltipCopy: (
       <PropSelect
         name="tooltipCopy"
@@ -931,7 +970,7 @@ function getPlayground(
       };
     case "select":
       return {
-        controls: [controls.required, controls.disabled, controls.hasHint, controls.error],
+        controls: [controls.choice, controls.required, controls.disabled, controls.hasHint, controls.error],
         preview: (
           <Select
             label="Region"
@@ -939,11 +978,12 @@ function getPlayground(
             disabled={Boolean(props.disabled)}
             hint={props.hasHint ? "Hint text is controlled by the hint prop." : undefined}
             error={props.error ? "Error text changes the invalid state." : undefined}
-            defaultValue="lake"
+            value={String(props.choice)}
+            onChange={(event) => setProp("choice", event.currentTarget.value)}
             options={[
-              { label: "Lake village", value: "lake" },
-              { label: "North ridge", value: "north" },
-              { label: "Old woods", value: "woods" },
+              { label: "Compact", value: "compact" },
+              { label: "Comfortable", value: "comfortable" },
+              { label: "Spacious", value: "spacious" },
             ]}
           />
         ),
@@ -1083,16 +1123,16 @@ function getPlayground(
       };
     case "alert":
       return {
-        controls: [controls.tone, controls.hasIcon],
+        controls: [controls.alertTone, controls.hasIcon],
         preview: (
-          <Alert title="Draft saved" tone={tone} icon={props.hasIcon ? <Sparkles size={18} /> : undefined}>
+          <Alert title="Draft saved" tone={alertTone} icon={props.hasIcon ? <Sparkles size={18} /> : undefined}>
             The tone and icon props reshape the same feedback message.
           </Alert>
         ),
       };
     case "dialog":
       return {
-        controls: [controls.hasFooter, controls.hasHint],
+        controls: [controls.hasFooter, controls.hasHint, controls.closeOnEscape, controls.closeOnInteractOutside],
         preview: (
           <>
             <Button variant="secondary" onClick={() => setDialogOpen(true)}>
@@ -1103,6 +1143,8 @@ function getPlayground(
               title="Confirm journey"
               description={props.hasHint ? "description adds supporting copy below the title." : undefined}
               onOpenChange={setDialogOpen}
+              closeOnEscape={Boolean(props.closeOnEscape)}
+              closeOnInteractOutside={Boolean(props.closeOnInteractOutside)}
               footer={
                 props.hasFooter ? (
                   <>
@@ -1127,12 +1169,12 @@ function getPlayground(
     case "skeleton":
       return {
         controls: [controls.skeletonVariant],
-        preview: <Skeleton variant={String(props.skeletonVariant) as "block" | "text"} />,
+        preview: <Skeleton variant={String(props.skeletonVariant) as "block" | "text" | "circle"} />,
       };
     case "spinner":
       return {
-        controls: [controls.size, controls.hasLabel],
-        preview: <Spinner size={size} label={hasLabel ? "Loading preview" : ""} />,
+        controls: [controls.size, controls.loadingLabel],
+        preview: <Spinner size={size} label={String(props.loadingLabel)} />,
       };
     case "avatar":
       return {
@@ -1150,7 +1192,241 @@ function getPlayground(
   }
 }
 
+function getPlaygroundCode(id: string, props: PlaygroundProps) {
+  const tone = String(props.tone);
+  const accent = String(props.accent);
+  const size = String(props.size);
+  const value = Number(props.value);
+  const max = Number(props.max);
+  const totalPages = Number(props.totalPages);
+  const page = Math.min(Number(props.page), totalPages);
+  const boundedValue = Math.min(value, max);
+  const choice = String(props.choice);
+  const alertTone = String(props.alertTone);
+  const hasHint = Boolean(props.hasHint);
+  const hasIcon = Boolean(props.hasIcon);
+
+  switch (id) {
+    case "button":
+      return jsxSnippet("Button", [
+        stringProp("variant", String(props.variant)),
+        stringProp("size", size),
+        booleanProp("disabled", Boolean(props.disabled), false),
+        hasIcon ? "icon={<Wand2 size={16} />}" : null,
+      ], "Button");
+    case "badge":
+      return jsxSnippet("Badge", [stringProp("tone", tone)], "Badge");
+    case "tooltip":
+      return [
+        `<Tooltip content="${escapeCode(String(props.tooltipCopy))}">`,
+        `  <button type="button">?</button>`,
+        `</Tooltip>`,
+      ].join("\n");
+    case "toast":
+      return [
+        `<ToastViewport>`,
+        `  <Toast`,
+        `    title="Status updated"`,
+        `    tone="${tone}"`,
+        Boolean(props.action) ? `    action={<Button size="sm">Undo</Button>}` : null,
+        `  >`,
+        `    The action prop controls the trailing command slot.`,
+        `  </Toast>`,
+        `</ToastViewport>`,
+      ].filter(Boolean).join("\n");
+    case "field":
+      return jsxSnippet("Field", [
+        `label="Traveler"`,
+        `placeholder="Fern"`,
+        booleanProp("required", Boolean(props.required), false),
+        booleanProp("disabled", Boolean(props.disabled), false),
+        hasHint ? `hint="Hint text is controlled by the hint prop."` : null,
+        Boolean(props.error) ? `error="Error text changes the invalid state."` : null,
+      ]);
+    case "select":
+      return [
+        `<Select`,
+        `  label="Region"`,
+        `  value="${choice}"`,
+        `  onChange={(event) => setValue(event.currentTarget.value)}`,
+        propLine(booleanProp("required", Boolean(props.required), false)),
+        propLine(booleanProp("disabled", Boolean(props.disabled), false)),
+        hasHint ? `  hint="Hint text is controlled by the hint prop."` : null,
+        Boolean(props.error) ? `  error="Error text changes the invalid state."` : null,
+        `  options={[`,
+        `    { label: "Compact", value: "compact" },`,
+        `    { label: "Comfortable", value: "comfortable" },`,
+        `    { label: "Spacious", value: "spacious" },`,
+        `  ]}`,
+        `/>`,
+      ].filter(Boolean).join("\n");
+    case "checkbox":
+      return jsxSnippet("Checkbox", [
+        `label="Remember route"`,
+        expressionProp("checked", Boolean(props.checked)),
+        booleanProp("disabled", Boolean(props.disabled), false),
+        hasHint ? `hint="The hint prop renders helper text."` : null,
+        `onChange={(event) => setChecked(event.currentTarget.checked)}`,
+      ]);
+    case "switch":
+      return jsxSnippet("Switch", [
+        `label="Campfire mode"`,
+        expressionProp("checked", Boolean(props.checked)),
+        booleanProp("disabled", Boolean(props.disabled), false),
+        `onChange={(event) => setChecked(event.currentTarget.checked)}`,
+      ]);
+    case "radio-group":
+      return [
+        `<RadioGroup`,
+        `  label="Density"`,
+        `  name="density"`,
+        `  value="${choice}"`,
+        propLine(booleanProp("disabled", Boolean(props.disabled), false)),
+        `  onChange={(event) => setValue(event.currentTarget.value)}`,
+        `  options={[`,
+        `    { label: "Compact", value: "compact" },`,
+        `    { label: "Comfortable", value: "comfortable" },`,
+        `    { label: "Spacious", value: "spacious" },`,
+        `  ]}`,
+        `/>`,
+      ].filter(Boolean).join("\n");
+    case "slider":
+      return jsxSnippet("Slider", [
+        `label="Ambient glow"`,
+        expressionProp("min", 0),
+        expressionProp("max", max),
+        expressionProp("value", boundedValue),
+        Boolean(props.hasLabel) ? `output="${boundedValue} / ${max}"` : null,
+        `onChange={(event) => setValue(Number(event.currentTarget.value))}`,
+      ]);
+    case "card":
+      return jsxSnippet("Card", [stringProp("accent", accent)], [
+        `<Badge tone="${accent}">Card</Badge>`,
+        `<p>The accent prop changes the border and highlight tone.</p>`,
+      ]);
+    case "accordion":
+      return [
+        `<Accordion`,
+        `  collapsible={${Boolean(props.collapsible)}}`,
+        `  defaultValue="${choice}"`,
+        `  items={[`,
+        `    { title: "Compact", value: "compact", content: "defaultValue opens this item first." },`,
+        `    { title: "Comfortable", value: "comfortable", content: "collapsible controls whether the open item can close." },`,
+        `    { title: "Spacious", value: "spacious", content: "Keyboard movement still works across triggers." },`,
+        `  ]}`,
+        `/>`,
+      ].join("\n");
+    case "tabs":
+      return [
+        `<Tabs`,
+        `  orientation="${String(props.orientation)}"`,
+        `  activationMode="${String(props.activationMode)}"`,
+        `  defaultValue="${choice}"`,
+        `  items={[`,
+        `    { label: "Compact", value: "compact", content: "defaultValue selects the initial panel." },`,
+        `    { label: "Comfortable", value: "comfortable", content: "orientation changes keyboard direction." },`,
+        `    { label: "Spacious", value: "spacious", content: "manual activation waits for Enter or Space." },`,
+        `  ]}`,
+        `/>`,
+      ].join("\n");
+    case "breadcrumb":
+      return [
+        `<Breadcrumb`,
+        `  separator="${escapeCode(String(props.separator))}"`,
+        `  items={[`,
+        `    { label: "Mosslight", href: "#" },`,
+        `    { label: "Components", href: "#" },`,
+        `    { label: "Breadcrumb", current: true },`,
+        `  ]}`,
+        `/>`,
+      ].join("\n");
+    case "pagination":
+      return jsxSnippet("Pagination", [
+        expressionProp("page", page),
+        expressionProp("totalPages", totalPages),
+        `onPageChange={setPage}`,
+      ]);
+    case "separator":
+      return jsxSnippet("Separator", [
+        stringProp("orientation", String(props.orientation)),
+        expressionProp("decorative", Boolean(props.decorative)),
+      ]);
+    case "alert":
+      return jsxSnippet("Alert", [
+        `title="Draft saved"`,
+        stringProp("tone", alertTone),
+        hasIcon ? `icon={<Sparkles size={18} />}` : null,
+      ], "The tone and icon props reshape the same feedback message.");
+    case "dialog":
+      return [
+        `<Dialog`,
+        `  open={open}`,
+        `  title="Confirm journey"`,
+        hasHint ? `  description="description adds supporting copy below the title."` : null,
+        `  onOpenChange={setOpen}`,
+        `  closeOnEscape={${Boolean(props.closeOnEscape)}}`,
+        `  closeOnInteractOutside={${Boolean(props.closeOnInteractOutside)}}`,
+        Boolean(props.hasFooter) ? `  footer={<DialogActions />}` : null,
+        `>`,
+        `  <p>Children render inside the dialog body.</p>`,
+        `</Dialog>`,
+      ].filter(Boolean).join("\n");
+    case "progress":
+      return jsxSnippet("Progress", [
+        expressionProp("value", boundedValue),
+        expressionProp("max", max),
+        Boolean(props.hasLabel) ? `label="Readiness"` : null,
+      ]);
+    case "skeleton":
+      return jsxSnippet("Skeleton", [stringProp("variant", String(props.skeletonVariant))]);
+    case "spinner":
+      return jsxSnippet("Spinner", [stringProp("size", size), stringProp("label", String(props.loadingLabel))]);
+    case "avatar":
+      return jsxSnippet("Avatar", [
+        `name="Fern Vale"`,
+        stringProp("size", size),
+        Boolean(props.hasImage) ? `src="https://github.com/sanghyun-io.png"` : null,
+      ]);
+    default:
+      return "";
+  }
+}
+
+function jsxSnippet(name: string, propLines: Array<string | null>, children?: string | string[]) {
+  const props = propLines.filter(Boolean);
+  const lines = [`<${name}`];
+  props.forEach((prop) => lines.push(`  ${prop}`));
+
+  if (!children) {
+    return [...lines, `/>`].join("\n");
+  }
+
+  const childLines = Array.isArray(children) ? children : [children];
+  return [...lines, `>`, ...childLines.map((line) => `  ${line}`), `</${name}>`].join("\n");
+}
+
+function stringProp(name: string, value: string) {
+  return `${name}="${escapeCode(value)}"`;
+}
+
+function expressionProp(name: string, value: string | number | boolean) {
+  return `${name}={${JSON.stringify(value)}}`;
+}
+
+function booleanProp(name: string, value: boolean, defaultValue: boolean) {
+  return value === defaultValue ? null : expressionProp(name, value);
+}
+
+function propLine(prop: string | null) {
+  return prop ? `  ${prop}` : null;
+}
+
+function escapeCode(value: string) {
+  return value.replace(/"/g, '\\"');
+}
+
 const toneOptions = ["moss", "sky", "amber", "plum"];
+const alertToneOptions = ["moss", "sky", "amber", "plum", "danger"];
 
 function PropSelect({
   name,
